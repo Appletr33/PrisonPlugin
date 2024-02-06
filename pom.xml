@@ -70,5 +70,12 @@
             <version>1.20.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.xander.server</groupId>
+            <artifactId>Spigot-1.20.2</artifactId>
+            <version>1</version>
+            <scope>system</scope>
+            <systemPath>/Users/alexander/Desktop/1.20.2 server/versions/1.20.2/paper-1.20.2.jar</systemPath>
+        </dependency>
     </dependencies>
 </project>
