@@ -3,12 +3,10 @@ package org.teameugene.prison.worlds.mars;
 import appl3.test.entities.CrazySnowman;
 import appl3.test.entities.DeathCallback;
 import org.bukkit.Location;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.teameugene.prison.tasks.Tasks;
 
-import static org.teameugene.prison.mine.Utils.getWorldByName;
+import static org.teameugene.prison.Util.Utils.getWorldByName;
 
 
 public class Mars {

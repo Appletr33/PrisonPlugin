@@ -1,16 +1,13 @@
 package org.teameugene.prison.tasks;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.teameugene.prison.User;
 import org.teameugene.prison.database.Database;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 
-import static org.teameugene.prison.mine.Utils.updateDatabase;
+import static org.teameugene.prison.Util.Utils.updateDatabase;
 import static org.teameugene.prison.scoreboard.ScoreBoard.displayScoreboard;
 
 public class Tasks {

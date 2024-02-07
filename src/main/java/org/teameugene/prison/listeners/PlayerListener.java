@@ -1,21 +1,32 @@
 package org.teameugene.prison.listeners;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.teameugene.prison.User;
 import org.teameugene.prison.database.Database;
+import org.teameugene.prison.enums.Upgrade;
 import org.teameugene.prison.mine.Schematic;
-import org.teameugene.prison.mine.Utils;
+import org.teameugene.prison.Util.Utils;
 
+import java.nio.file.attribute.UserPrincipal;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import static org.teameugene.prison.mine.Utils.getWorldByName;
+import static org.teameugene.prison.Util.Utils.*;
+import static org.teameugene.prison.items.ItemUtils.getItemUpgrades;
+import static org.teameugene.prison.items.ItemUtils.getLevel;
+import static org.teameugene.prison.items.Upgrades.detonateBlocks;
+import static org.teameugene.prison.items.Upgrades.speedUpgrade;
 import static org.teameugene.prison.scoreboard.ScoreBoard.displayScoreboard;
 
 public class PlayerListener implements org.bukkit.event.Listener {
@@ -49,7 +60,7 @@ public class PlayerListener implements org.bukkit.event.Listener {
             // If not, create an entry for them
             database.createPlayerEntry(sPlayerUniqueId);
             //player is a new player so set them up
-            newPlayer(player);
+            newPlayer(player, schematicArrayList, starterShipSchematicName, shipWorldName, connectedPlayers, database);
         }
          /*
                         END NEW PLAYER LOGIC
@@ -88,17 +99,36 @@ public class PlayerListener implements org.bukkit.event.Listener {
         }
     }
 
-    private void newPlayer(Player player) {
-        player.sendMessage("Welcome to the moon trooper, " + player.getName() + "!");
-        Utils.giveItemsToPlayer(player);
-        createStarterShip(player);
+    @EventHandler
+    public void onFoodLevelChange(FoodLevelChangeEvent event) {
+        // Cancel food level change events
+        event.setCancelled(true);
     }
 
-    private void createStarterShip(Player player) {
-        double[] pos = database.getPlayerShipCoordinates(player.getUniqueId());
-        for (Schematic schematic : schematicArrayList) {
-            if (schematic.getName().equals(starterShipSchematicName + ".schem")) {
-                schematic.paste(new Location(getWorldByName(shipWorldName), pos[0] - 14, pos[1] - 5, pos[2])); //-14 and -5 are offset values for the schematic so the player spawns on the ship
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        Player player = event.getPlayer();
+        Block brokenBlock = event.getBlock();
+
+        if (brokenBlock.getType() == Material.STONE)
+            event.setDropItems(false);
+
+        getUserFromPlayer(player, connectedPlayers).addPoints(1);
+
+        ItemStack itemUsed = player.getInventory().getItemInMainHand();
+        ArrayList<Upgrade> itemUpgrades = getItemUpgrades(itemUsed);
+
+        for (Upgrade upgrade : itemUpgrades) {
+            if (upgrade.equals(Upgrade.ATOMIC_DETONATE)) {
+                if (brokenBlock.getType() == Material.STONE) {
+                    int level = getLevel(upgrade, itemUsed);
+                    getUserFromPlayer(player, connectedPlayers).addPoints(detonateBlocks(brokenBlock, level, player, connectedPlayers));
+
+                }
+            }
+            if (upgrade.equals(Upgrade.SPEED)) {
+                int level = getLevel(upgrade, itemUsed);
+                speedUpgrade(player, level);
             }
         }
     }

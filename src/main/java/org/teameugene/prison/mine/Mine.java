@@ -8,8 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import static org.teameugene.prison.mine.Utils.broadcastMessageInWorld;
-import static org.teameugene.prison.mine.Utils.getWorldByName;
+import static org.teameugene.prison.Util.Utils.*;
 
 public class Mine {
 
@@ -23,11 +22,12 @@ public class Mine {
     Location corner1;
     Location corner2;
 
-    public Mine(Plugin plugin) {
+    public Mine(Plugin plugin, Location corner1, Location corner2) {
         this.plugin = plugin;
         world = Bukkit.getWorld(worldName);
-        corner1 = new Location(world, -1729, 20, 768);
-        corner2 = new Location(world, -1776, 0, 815);
+        this.corner1 = corner1;
+        this.corner2 = corner2;
+
 
         registerTasks();
     }
@@ -92,15 +92,6 @@ public class Mine {
                 }
             }
         }
-    }
-
-    private boolean isInRegion(Location source, Location bound1, Location bound2) {
-        return source.getX() >= Math.min(bound1.getX(), bound2.getX()) &&
-                source.getY() >= Math.min(bound1.getY(), bound2.getY()) &&
-                source.getZ() >= Math.min(bound1.getZ(), bound2.getZ()) &&
-                source.getX() <= Math.max(bound1.getX(), bound2.getX()) &&
-                source.getY() <= Math.max(bound1.getY(), bound2.getY()) &&
-                source.getZ() <= Math.max(bound1.getZ(), bound2.getZ());
     }
 
     private void regenerateBlocks() {

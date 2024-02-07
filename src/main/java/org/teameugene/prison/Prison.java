@@ -1,9 +1,6 @@
 package org.teameugene.prison;
 
-import org.bukkit.Bukkit;
-import org.bukkit.GameRule;
-import org.bukkit.Server;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.teameugene.prison.database.Database;
 import org.teameugene.prison.listeners.InventoryListener;
@@ -16,11 +13,12 @@ import org.teameugene.prison.worlds.mars.Mars;
 
 import java.util.ArrayList;
 
-import static org.teameugene.prison.mine.Utils.getWorldByName;
-import static org.teameugene.prison.mine.Utils.updateDatabase;
+import static org.teameugene.prison.Util.Utils.getWorldByName;
+import static org.teameugene.prison.Util.Utils.updateDatabase;
 
 public final class Prison extends JavaPlugin {
 
+    private static Prison instance;
     Mine mine;
     Database database;
     ArrayList<Schematic> schematics;
@@ -28,8 +26,12 @@ public final class Prison extends JavaPlugin {
     String marsWorldName = "mars";
     ArrayList<User> connectedPlayers;
 
+    public static final Location corner1 = new Location(getWorldByName("world"), -1729, 20, 768);
+    public static final Location corner2 = new Location(getWorldByName("world"), -1776, 0, 815);
+
     @Override
     public void onEnable() {
+        instance = this;
         getLogger().info("[STARTING]: Initializing Main Prison Plugin");
 
         //Plugin Initialization Logic
@@ -44,7 +46,7 @@ public final class Prison extends JavaPlugin {
         schematics = Schematic.loadSchematics(this);
 
         //Create new mine
-        mine = new Mine(this);
+        mine = new Mine(this, corner1, corner2);
         //Connect to database
         database = new Database(this);
 
@@ -62,6 +64,10 @@ public final class Prison extends JavaPlugin {
         getLogger().info("[COMPLETED]: Finished Initializing Main Prison Plugin");
     }
 
+    public static Prison getInstance() {
+        return instance;
+    }
+
     @Override
     public void onDisable() {
         // Plugin shutdown logic
@@ -70,6 +76,14 @@ public final class Prison extends JavaPlugin {
     }
 
     private void setRules() {
+        if (Bukkit.getWorld(shipWorldName) == null){
+            new WorldCreator(shipWorldName).createWorld();
+        }
+
+        if (Bukkit.getWorld(marsWorldName) == null){
+            new WorldCreator(marsWorldName).createWorld();
+        }
+
         for (World world : Bukkit.getWorlds()) {
             world.setGameRule(GameRule.KEEP_INVENTORY, true);
             world.setGameRule(GameRule.MOB_GRIEFING, false);

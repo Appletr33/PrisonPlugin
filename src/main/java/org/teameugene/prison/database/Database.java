@@ -1,12 +1,8 @@
 package org.teameugene.prison.database;
 
-import com.sk89q.worldedit.math.Vector3;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.sql.Connection;
@@ -15,8 +11,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
-
-import org.teameugene.prison.mine.Utils;
 
 
 public class Database {

@@ -1,4 +1,4 @@
-package org.teameugene.prison.mine;
+package org.teameugene.prison.Util;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -14,8 +14,11 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -23,6 +26,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.teameugene.prison.Prison;
 import org.teameugene.prison.User;
 import org.teameugene.prison.database.Database;
+import org.teameugene.prison.mine.Schematic;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -105,5 +109,91 @@ public class Utils {
             for (User user : connectedPlayers) {
                 database.updatePoints(user.getUUID(), user.getPoints());
             }
+    }
+
+    public static void newPlayer(Player player, ArrayList<Schematic> schematicArrayList, String starterShipSchematicName, String shipWorldName, ArrayList<User> connectedPlayers, Database database) {
+        player.sendMessage("Welcome to the moon trooper, " + player.getName() + "!");
+        Utils.giveItemsToPlayer(player);
+
+        //Create the startership
+        double[] pos = database.getPlayerShipCoordinates(player.getUniqueId());
+        for (Schematic schematic : schematicArrayList) {
+            if (schematic.getName().equals(starterShipSchematicName + ".schem")) {
+                schematic.paste(new Location(getWorldByName(shipWorldName), pos[0] - 14, pos[1] - 5, pos[2])); //-14 and -5 are offset values for the schematic so the player spawns on the ship
+            }
+        }
+    }
+
+    public static boolean isInRegion(Location source, Location bound1, Location bound2) {
+        return source.getX() >= Math.min(bound1.getX(), bound2.getX()) &&
+                source.getY() >= Math.min(bound1.getY(), bound2.getY()) &&
+                source.getZ() >= Math.min(bound1.getZ(), bound2.getZ()) &&
+                source.getX() <= Math.max(bound1.getX(), bound2.getX()) &&
+                source.getY() <= Math.max(bound1.getY(), bound2.getY()) &&
+                source.getZ() <= Math.max(bound1.getZ(), bound2.getZ());
+    }
+
+    public static int mineSquare(Player player, BlockFace blockFace, Block brokenBlock, int radius, Location minebounds1, Location minebounds2) {
+        World world = player.getWorld();
+        int stoneBroken = 0;
+
+        int startX = brokenBlock.getX() - radius;
+        int startY = brokenBlock.getY() - radius;
+        int startZ = brokenBlock.getZ() - radius;
+
+        int endX = brokenBlock.getX() + radius;
+        int endY = brokenBlock.getY() + radius;
+        int endZ = brokenBlock.getZ() + radius;
+
+        switch (blockFace) {
+            case NORTH:
+                break;
+            case SOUTH:
+                break;
+            case EAST:
+            case WEST:
+                break;
+            case UP:
+                break;
+            case DOWN:
+//                startY = brokenBlock.getY();
+//                endY = brokenBlock.getY() + 1;
+                break;
+        }
+
+        for (int y = startY; y <= endY; y++) {
+            for (int x = startX; x <= endX; x++) {
+                for (int z = startZ; z <= endZ; z++) {
+                    Block block = world.getBlockAt(x, y, z);
+                    if (block.getType().equals(Material.STONE))
+                        if (isInRegion(block.getLocation(), minebounds1, minebounds2)) {
+                            block.setType(Material.AIR);
+                            stoneBroken++;
+                        }
+                }
+            }
+        }
+        return stoneBroken;
+    }
+
+    public static BlockFace determineBlockFace(Player player) {
+        double yaw = (player.getLocation().getYaw() + 360) % 360;
+        double pitch = player.getLocation().getPitch();
+        if (pitch > 45) {
+            return BlockFace.DOWN;
+        } else if (pitch < -45) {
+            return BlockFace.UP;
+        } else {
+            if (yaw >= 45 && yaw < 135) {
+                return BlockFace.NORTH;
+            } else if (yaw >= 135 && yaw < 225) {
+                return BlockFace.EAST;
+            } else if (yaw >= 225 && yaw < 315) {
+                return BlockFace.SOUTH;
+            } else if (yaw >= 315 || yaw < 45) {
+                return BlockFace.WEST;
+            }
+        }
+        return null;
     }
 }
