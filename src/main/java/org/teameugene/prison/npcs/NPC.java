@@ -32,7 +32,7 @@ import java.util.UUID;
 
 import static org.teameugene.prison.Util.Utils.*;
 
-public class NPC {
+public abstract class NPC {
     private static final ArrayList<NPC> npcs = new ArrayList<>();
     ServerPlayer npc;
     GameProfile gameProfile;
@@ -41,6 +41,7 @@ public class NPC {
     Location location;
     int pitch = 0;
     int yaw = 180;
+    int npcId;
 
     public NPC(String name, Location location, String skinName) {
         if (name.length() < 16) {
@@ -53,6 +54,7 @@ public class NPC {
 
             npc = new ServerPlayer(minecraftServer, serverLevel, gameProfile, ClientInformation.createDefault());
             npc.setPos(location.getX(), location.getY(), location.getZ());
+            npcId = npc.getId();
         } else {
             Prison.getInstance().getLogger().info("[ERROR] NAME TO LONG FOR [NPC] " + name + ". Failed to create NPC. Name must be less than or equal to 16 characters");
         }
@@ -62,6 +64,10 @@ public class NPC {
         this.pitch = pitch;
         this.yaw = yaw;
     }
+
+    public abstract void interact(Player player);
+
+    protected abstract void openGUI();
 
     public static void showNPCS(Player player) {
         for (NPC npcPlayer : npcs) {
@@ -97,7 +103,7 @@ public class NPC {
         WeaponForger weaponForger = new WeaponForger("Weapon Forger", new Location(getWorldByName("world"), -1791, 30, 796), "appl3");
         weaponForger.setRotation(0, 90);
 
-        ArmorSmith armorSmith = new ArmorSmith("Armor Forger", new Location(getWorldByName("world"), -1791, 30, 797), "appl3");
+        ArmorSmith armorSmith = new ArmorSmith("Armor Smith", new Location(getWorldByName("world"), -1791, 30, 797), "appl3");
         armorSmith.setRotation(0, 90);
         npcs.add(moonMerchant);
         npcs.add(weaponForger);
@@ -124,5 +130,13 @@ public class NPC {
     private void changeSkin(String value, String signature, GameProfile gameProfile) {
         gameProfile.getProperties().removeAll("textures");
         gameProfile.getProperties().put("textures", new Property("textures", value, signature));
+    }
+
+    public static ArrayList<NPC> getNpcs() {
+        return npcs;
+    }
+
+    public int getNpcId() {
+        return npcId;
     }
 }

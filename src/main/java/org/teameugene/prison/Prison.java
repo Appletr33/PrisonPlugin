@@ -6,6 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.teameugene.prison.database.Database;
 import org.teameugene.prison.listeners.InventoryListener;
 import org.teameugene.prison.listeners.ItemListener;
+import org.teameugene.prison.listeners.NPCInteractListener;
 import org.teameugene.prison.listeners.PlayerListener;
 import org.teameugene.prison.mine.Mine;
 import org.teameugene.prison.mine.Schematic;
@@ -27,7 +28,7 @@ public final class Prison extends JavaPlugin {
     public static final String shipWorldName = "shipworld";
     public static final String marsWorldName = "mars";
     public static final String moonWorldName = "world";
-    ArrayList<User> connectedPlayers;
+    public static final ArrayList<User> connectedPlayers = new ArrayList<>();
     public static final Random random = new Random();
 
     public static final Location corner1 = new Location(getWorldByName("world"), -1729, 20, 768);
@@ -47,7 +48,6 @@ public final class Prison extends JavaPlugin {
         random.setSeed(System.currentTimeMillis() + 1349832);
 
         //Initialize activePlayers ArrayList
-        connectedPlayers = new ArrayList<>();
         for (Player player : Bukkit.getOnlinePlayers()) {
             initPlayer(database, player, connectedPlayers);
         }
@@ -71,6 +71,7 @@ public final class Prison extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerListener(this, database, schematics, shipWorldName, connectedPlayers), this);
         getServer().getPluginManager().registerEvents(new ItemListener(this, database, shipWorldName, connectedPlayers), this);
         getServer().getPluginManager().registerEvents(new InventoryListener(this, database, connectedPlayers), this);
+        getServer().getPluginManager().registerEvents(new NPCInteractListener(), this);
 
         //Spawn our NPCS
         NPC.setupNPCS();
@@ -102,6 +103,7 @@ public final class Prison extends JavaPlugin {
             world.setGameRule(GameRule.KEEP_INVENTORY, true);
             world.setGameRule(GameRule.MOB_GRIEFING, false);
             world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+            world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
             world.setStorm(false);
         }
         getWorldByName("world").setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);

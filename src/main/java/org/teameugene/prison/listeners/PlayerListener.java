@@ -14,6 +14,7 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.teameugene.prison.PacketReader;
 import org.teameugene.prison.User;
 import org.teameugene.prison.database.Database;
 import org.teameugene.prison.enums.Upgrade;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import static org.teameugene.prison.Util.Utils.*;
+import static org.teameugene.prison.enums.Ore.oreToItem;
 import static org.teameugene.prison.items.ItemUtils.getItemUpgrades;
 import static org.teameugene.prison.items.ItemUtils.getLevel;
 import static org.teameugene.prison.items.Upgrades.*;
@@ -69,6 +71,8 @@ public class PlayerListener implements org.bukkit.event.Listener {
          */
         initPlayer(database, player, connectedPlayers);
         showNPCS(event.getPlayer());
+        PacketReader pr = new PacketReader(event.getPlayer());
+        pr.inject();
     }
 
     @EventHandler
@@ -120,6 +124,7 @@ public class PlayerListener implements org.bukkit.event.Listener {
         if (brokenBlock.getType() != Material.STONE) {
             ItemStack[] drops = brokenBlock.getDrops().toArray(new ItemStack[0]);
             for (ItemStack drop : drops) {
+                drop = oreToItem(drop);
                 addItemOrDrop(player, drop);
             }
         }

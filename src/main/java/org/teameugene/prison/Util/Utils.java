@@ -265,4 +265,17 @@ public class Utils {
         }
         return text.toString();
     }
+
+    public static Object getPrivateValue(Object instance, String name) {
+        Object result = null;
+        try {
+            Field field = instance.getClass().getDeclaredField(name);
+            field.setAccessible(true);
+            result = field.get(instance);
+            field.setAccessible(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 }
