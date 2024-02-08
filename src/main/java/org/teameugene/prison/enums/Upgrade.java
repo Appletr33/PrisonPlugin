@@ -12,7 +12,8 @@ public enum Upgrade {
     EFFICIENCY("Efficiency", Enchantment.DIG_SPEED, ChatColor.GREEN, Material.BLAZE_ROD, 2, 10),
     FORTUNE("Fortune", Enchantment.LOOT_BONUS_BLOCKS, ChatColor.AQUA, Material.DIAMOND, 2, 10),
     ATOMIC_DETONATE("Atomic Detonate", null, ChatColor.RED, Material.TNT, 3, 5),
-    SPEED("Speed", null, ChatColor.LIGHT_PURPLE, Material.RABBIT_FOOT, 2, 3);
+    SPEED("Speed", null, ChatColor.LIGHT_PURPLE, Material.SUGAR, 2, 3),
+    JUMP("Jump", null, ChatColor.YELLOW, Material.RABBIT_FOOT, 3, 3);
 
     private final String stringValue;
     private final Enchantment enchantment;

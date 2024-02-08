@@ -1,26 +1,16 @@
 package org.teameugene.prison.Util;
 
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
-import com.sk89q.worldedit.function.operation.Operation;
-import com.sk89q.worldedit.function.operation.Operations;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.session.ClipboardHolder;
+import net.minecraft.network.protocol.Packet;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.craftbukkit.v1_20_R2.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.teameugene.prison.Prison;
@@ -32,7 +22,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.Scanner;
+
+import static org.teameugene.prison.scoreboard.ScoreBoard.displayScoreboard;
 
 public class Utils {
 
@@ -195,5 +191,78 @@ public class Utils {
             }
         }
         return null;
+    }
+
+    public static int randomInt(int low, int high) {
+        return Prison.random.nextInt(high-low) + low;
+    }
+
+    public static void initPlayer(Database database, Player player, ArrayList<User> connectedPlayers) {
+        User user = new User(database.getPoints(player.getUniqueId()), player);
+        connectedPlayers.add(user);
+        displayScoreboard(player, user.getPoints());
+    }
+
+    public static void addItemOrDrop(Player player, ItemStack itemStack) {
+        Inventory inventory = player.getInventory();
+
+        // Check if the player's inventory is full
+        if (inventory.firstEmpty() != -1) {
+            // Inventory has empty slots, add item to inventory
+            inventory.addItem(itemStack);
+            return; // Exit the function after adding the item
+        }
+
+        // Check if there are slots with the same item type but not at a full stack
+        for (int i = 0; i < inventory.getSize(); i++) {
+            ItemStack slotItem = inventory.getItem(i);
+            if (slotItem != null && slotItem.isSimilar(itemStack) && slotItem.getAmount() < slotItem.getMaxStackSize()) {
+                int spaceLeft = slotItem.getMaxStackSize() - slotItem.getAmount();
+                if (spaceLeft >= itemStack.getAmount()) {
+                    // There is enough space in this slot for the entire item stack
+                    slotItem.setAmount(slotItem.getAmount() + itemStack.getAmount());
+                    return; // Exit the function after adding the item
+                } else {
+                    // Add as much of the item as possible to this slot and continue to next slot
+                    slotItem.setAmount(slotItem.getMaxStackSize());
+                    itemStack.setAmount(itemStack.getAmount() - spaceLeft);
+                }
+            }
+        }
+
+        // If no suitable slot was found, drop the remaining item stack
+        player.getWorld().dropItem(player.getLocation(), itemStack);
+    }
+
+    public static void sendPacket(Packet<?> packet, Player player) {
+        ((CraftPlayer) player).getHandle().connection.send(packet);
+    }
+
+    public static void setValue(Object packet, String fieldName, Object value) {
+        try {
+            Field field = packet.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(packet, value);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    public static String getStringFromURL(String url) {
+        StringBuilder text = new StringBuilder();
+        try {
+            Scanner scanner = new Scanner(new URL(url).openStream());
+            while (scanner.hasNext()) {
+                String line = scanner.nextLine();
+                while (line.startsWith(" ")) {
+                    line = line.substring(1);
+                }
+                text.append(line);
+            }
+            scanner.close();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+        return text.toString();
     }
 }

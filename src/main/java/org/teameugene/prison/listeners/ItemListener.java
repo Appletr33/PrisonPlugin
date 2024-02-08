@@ -39,18 +39,19 @@ public class ItemListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         if (isPick(player.getInventory().getItemInMainHand())) {
-            if (player.isSneaking() && event.getAction() == Action.LEFT_CLICK_AIR)
+            if ((player.isSneaking() && event.getAction() == Action.RIGHT_CLICK_AIR) || (player.isSneaking() && event.getAction() == Action.RIGHT_CLICK_BLOCK))
                 openUpgradeGUI(player, player.getInventory().getItemInMainHand());
         }
 
         else if (isTeleport(player.getInventory().getItemInMainHand())) {
-            if (event.getAction() == Action.LEFT_CLICK_AIR) {
+            if (event.getAction() == Action.RIGHT_CLICK_AIR) {
                 openTeleportationGUI(player);
             }
 
             else if ((event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
                 // Cancel the event to prevent placing the redstone torch
                 event.setCancelled(true);
+                openTeleportationGUI(player);
             }
         }
     }

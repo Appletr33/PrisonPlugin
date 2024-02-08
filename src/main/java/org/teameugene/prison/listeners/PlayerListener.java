@@ -2,6 +2,7 @@ package org.teameugene.prison.listeners;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,6 +10,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -25,8 +27,8 @@ import java.util.UUID;
 import static org.teameugene.prison.Util.Utils.*;
 import static org.teameugene.prison.items.ItemUtils.getItemUpgrades;
 import static org.teameugene.prison.items.ItemUtils.getLevel;
-import static org.teameugene.prison.items.Upgrades.detonateBlocks;
-import static org.teameugene.prison.items.Upgrades.speedUpgrade;
+import static org.teameugene.prison.items.Upgrades.*;
+import static org.teameugene.prison.npcs.NPC.showNPCS;
 import static org.teameugene.prison.scoreboard.ScoreBoard.displayScoreboard;
 
 public class PlayerListener implements org.bukkit.event.Listener {
@@ -65,9 +67,13 @@ public class PlayerListener implements org.bukkit.event.Listener {
          /*
                         END NEW PLAYER LOGIC
          */
-        User user = new User(database.getPoints(playerUniqueId), player);
-        this.connectedPlayers.add(user);
-        displayScoreboard(player, user.getPoints());
+        initPlayer(database, player, connectedPlayers);
+        showNPCS(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+        showNPCS(event.getPlayer());
     }
 
     @EventHandler
@@ -109,27 +115,17 @@ public class PlayerListener implements org.bukkit.event.Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
         Block brokenBlock = event.getBlock();
+        event.setDropItems(false);
 
-        if (brokenBlock.getType() == Material.STONE)
-            event.setDropItems(false);
-
-        getUserFromPlayer(player, connectedPlayers).addPoints(1);
-
-        ItemStack itemUsed = player.getInventory().getItemInMainHand();
-        ArrayList<Upgrade> itemUpgrades = getItemUpgrades(itemUsed);
-
-        for (Upgrade upgrade : itemUpgrades) {
-            if (upgrade.equals(Upgrade.ATOMIC_DETONATE)) {
-                if (brokenBlock.getType() == Material.STONE) {
-                    int level = getLevel(upgrade, itemUsed);
-                    getUserFromPlayer(player, connectedPlayers).addPoints(detonateBlocks(brokenBlock, level, player, connectedPlayers));
-
-                }
-            }
-            if (upgrade.equals(Upgrade.SPEED)) {
-                int level = getLevel(upgrade, itemUsed);
-                speedUpgrade(player, level);
+        if (brokenBlock.getType() != Material.STONE) {
+            ItemStack[] drops = brokenBlock.getDrops().toArray(new ItemStack[0]);
+            for (ItemStack drop : drops) {
+                addItemOrDrop(player, drop);
             }
         }
+
+        getUserFromPlayer(player, connectedPlayers).addPoints(1);
+        ItemStack itemUsed = player.getInventory().getItemInMainHand();
+        applyUpgrades(connectedPlayers, player, itemUsed, brokenBlock);
     }
 }

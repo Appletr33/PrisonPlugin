@@ -1,6 +1,7 @@
 package org.teameugene.prison;
 
 import org.bukkit.*;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.teameugene.prison.database.Database;
 import org.teameugene.prison.listeners.InventoryListener;
@@ -8,13 +9,14 @@ import org.teameugene.prison.listeners.ItemListener;
 import org.teameugene.prison.listeners.PlayerListener;
 import org.teameugene.prison.mine.Mine;
 import org.teameugene.prison.mine.Schematic;
+import org.teameugene.prison.npcs.NPC;
 import org.teameugene.prison.tasks.Tasks;
 import org.teameugene.prison.worlds.mars.Mars;
 
 import java.util.ArrayList;
+import java.util.Random;
 
-import static org.teameugene.prison.Util.Utils.getWorldByName;
-import static org.teameugene.prison.Util.Utils.updateDatabase;
+import static org.teameugene.prison.Util.Utils.*;
 
 public final class Prison extends JavaPlugin {
 
@@ -22,9 +24,11 @@ public final class Prison extends JavaPlugin {
     Mine mine;
     Database database;
     ArrayList<Schematic> schematics;
-    String shipWorldName = "shipworld";
-    String marsWorldName = "mars";
+    public static final String shipWorldName = "shipworld";
+    public static final String marsWorldName = "mars";
+    public static final String moonWorldName = "world";
     ArrayList<User> connectedPlayers;
+    public static final Random random = new Random();
 
     public static final Location corner1 = new Location(getWorldByName("world"), -1729, 20, 768);
     public static final Location corner2 = new Location(getWorldByName("world"), -1776, 0, 815);
@@ -36,8 +40,17 @@ public final class Prison extends JavaPlugin {
 
         //Plugin Initialization Logic
 
+        //Connect to database
+        database = new Database(this);
+
+        //Set Random Seed
+        random.setSeed(System.currentTimeMillis() + 1349832);
+
         //Initialize activePlayers ArrayList
         connectedPlayers = new ArrayList<>();
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            initPlayer(database, player, connectedPlayers);
+        }
 
         //Set Keep Inventory and time rules
         setRules();
@@ -47,8 +60,6 @@ public final class Prison extends JavaPlugin {
 
         //Create new mine
         mine = new Mine(this, corner1, corner2);
-        //Connect to database
-        database = new Database(this);
 
         //Load tasks which depend on database connection being established
         new Tasks(this, database, connectedPlayers);
@@ -60,6 +71,9 @@ public final class Prison extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerListener(this, database, schematics, shipWorldName, connectedPlayers), this);
         getServer().getPluginManager().registerEvents(new ItemListener(this, database, shipWorldName, connectedPlayers), this);
         getServer().getPluginManager().registerEvents(new InventoryListener(this, database, connectedPlayers), this);
+
+        //Spawn our NPCS
+        NPC.setupNPCS();
 
         getLogger().info("[COMPLETED]: Finished Initializing Main Prison Plugin");
     }
@@ -87,7 +101,12 @@ public final class Prison extends JavaPlugin {
         for (World world : Bukkit.getWorlds()) {
             world.setGameRule(GameRule.KEEP_INVENTORY, true);
             world.setGameRule(GameRule.MOB_GRIEFING, false);
+            world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+            world.setStorm(false);
         }
+        getWorldByName("world").setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+        getWorldByName("world").setTime(13000); // just before sunset
+
         getWorldByName(shipWorldName).setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
         getWorldByName(shipWorldName).setTime(18000); // 12am
 

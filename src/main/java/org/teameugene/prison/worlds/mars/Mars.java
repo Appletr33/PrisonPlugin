@@ -1,7 +1,5 @@
 package org.teameugene.prison.worlds.mars;
 
-import appl3.test.entities.CrazySnowman;
-import appl3.test.entities.DeathCallback;
 import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -17,12 +15,12 @@ public class Mars {
         new spawnMonster().runTaskTimer(plugin, 0, 20 * 60);
     }
 
-    DeathCallback myDeathCallback = new DeathCallback() {
-        @Override
-        public void onDeath() {
-            monsterActive = false;
-        }
-    };
+//    DeathCallback myDeathCallback = new DeathCallback() {
+//        @Override
+//        public void onDeath() {
+//            monsterActive = false;
+//        }
+//    };
 
 
     private class spawnMonster extends BukkitRunnable {
@@ -31,7 +29,7 @@ public class Mars {
             long currentTime = System.currentTimeMillis();
             if (!monsterActive && (currentTime - lastSpawnTime >= 10000)) {
                 //Spawn bozo
-                CrazySnowman.spawn(new Location(getWorldByName("mars"), -162, 29, 160), myDeathCallback);
+                //CrazySnowman.spawn(new Location(getWorldByName("mars"), -162, 29, 160), myDeathCallback);
                 lastSpawnTime = currentTime;
                 monsterActive = true;
             }

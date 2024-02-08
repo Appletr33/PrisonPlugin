@@ -4,9 +4,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.Random;
 
 import static org.teameugene.prison.Util.Utils.*;
 
@@ -98,6 +101,7 @@ public class Mine {
         // Replace "your_world_name" with the actual world name
 
         if (world != null) {
+            //Generate Stone
             int minX = Math.min(corner1.getBlockX(), corner2.getBlockX());
             int minY = Math.min(corner1.getBlockY(), corner2.getBlockY());
             int minZ = Math.min(corner1.getBlockZ(), corner2.getBlockZ());
@@ -113,7 +117,74 @@ public class Mine {
                     }
                 }
             }
+
+            //Generate Ores
+            spawnOre(minX, minY, minZ, maxX, maxY, maxZ);
         }
     }
 
+    private void spawnOre(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        //ORE
+        for (int i = 0; i < 50; i++) {
+            // SELECT ORE TYPE //
+            Material oreType = null;
+            int amountToSpawn = 0;
+            switch(randomInt(0, 5)) {
+                case 0:
+                    oreType = Material.COAL_ORE;
+                    amountToSpawn = randomInt(8, 12);
+                    break;
+                case 1:
+                    oreType = Material.REDSTONE_ORE;
+                    amountToSpawn = randomInt(3, 6);
+                    break;
+                case 2:
+                    oreType = Material.REDSTONE_ORE;
+                    amountToSpawn = randomInt(3, 8);
+                    break;
+                case 3:
+                    oreType = Material.IRON_ORE;
+                    amountToSpawn = randomInt(5, 10);
+                    break;
+                case 4:
+                    oreType = Material.GOLD_ORE;
+                    amountToSpawn = randomInt(1, 3);
+                    break;
+            }
+            if (oreType == null) break;
+            if (amountToSpawn <= 0) break;
+
+            //Vein SPAWNING LOGIC//
+            int oreVeinX = randomInt(minX + 1, maxX);
+            int oreVeinY = randomInt(minY+ 1, maxY);
+            int oreVeinZ = randomInt(minZ+ 1, maxZ);
+
+            Block centerBlock = world.getBlockAt(oreVeinX, oreVeinY, oreVeinZ); //Set center of ore Vein
+            centerBlock.setType(oreType);
+            amountToSpawn--;
+            // The radius within which blocks will be spawned around the center block
+            int radius = 3;
+            createVein(radius, oreType, amountToSpawn, centerBlock.getLocation());
+        }
+    }
+
+    private void createVein(int radius, Material oreType, int amountToSpawn, Location center) {
+        int oreSpawned = 0;
+        for (int x = -radius; x <= radius; x++) {
+            for (int y = -radius; y <= radius; y++) {
+                for (int z = -radius; z <= radius; z++) {
+                    if (Math.sqrt(x * x + y * y + z * z) <= radius) {
+                        Block block = world.getBlockAt(center.getBlockX() + x, center.getBlockY() + y, center.getBlockZ() + z);
+                        if (isInRegion(block.getLocation(), corner1, corner2)) {
+                            if (block.getType() == Material.STONE) {
+                                block.setType(oreType);
+                                oreSpawned++;
+                                if (oreSpawned >= amountToSpawn) return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
