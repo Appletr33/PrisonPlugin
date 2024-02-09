@@ -170,7 +170,7 @@ public class ItemUtils {
         return 0;
     }
 
-    private static ItemStack createItemGUI(String upgradeName, String lore, Material material) {
+    public static ItemStack createItemGUI(String upgradeName, String lore, Material material) {
         ItemStack item = new ItemStack(material);
         ItemMeta itemMeta = item.getItemMeta();
         itemMeta.setDisplayName(upgradeName);

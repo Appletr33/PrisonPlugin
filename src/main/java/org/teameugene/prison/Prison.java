@@ -10,7 +10,7 @@ import org.teameugene.prison.listeners.ItemListener;
 import org.teameugene.prison.listeners.NPCInteractListener;
 import org.teameugene.prison.listeners.PlayerListener;
 import org.teameugene.prison.mine.Mine;
-import org.teameugene.prison.mine.Schematic;
+import org.teameugene.prison.ship.Schematic;
 import org.teameugene.prison.npcs.NPC;
 import org.teameugene.prison.tasks.Tasks;
 import org.teameugene.prison.worlds.mars.Mars;

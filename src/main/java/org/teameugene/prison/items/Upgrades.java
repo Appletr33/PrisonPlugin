@@ -32,7 +32,7 @@ public class Upgrades {
                 if (upgrade.equals(Upgrade.ATOMIC_DETONATE)) {
                     if (brokenBlock.getType() == Material.STONE) {
                         int level = getLevel(upgrade, itemUsed);
-                        getUserFromPlayer(player, connectedPlayers).addPoints(detonateBlocks(brokenBlock, level, player, connectedPlayers));
+                        getUserFromPlayer(player, connectedPlayers).addPoints(detonateBlocks(brokenBlock, level, player, connectedPlayers) - 1); // -1 cause one of the blocks we broke is the original one
 
                     }
                 }

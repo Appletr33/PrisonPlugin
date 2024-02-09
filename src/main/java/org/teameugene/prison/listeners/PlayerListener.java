@@ -2,7 +2,6 @@ package org.teameugene.prison.listeners;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -19,21 +18,15 @@ import org.bukkit.plugin.Plugin;
 import org.teameugene.prison.PacketReader;
 import org.teameugene.prison.User;
 import org.teameugene.prison.database.Database;
-import org.teameugene.prison.enums.Upgrade;
-import org.teameugene.prison.mine.Schematic;
-import org.teameugene.prison.Util.Utils;
+import org.teameugene.prison.ship.Schematic;
 
-import java.nio.file.attribute.UserPrincipal;
 import java.util.ArrayList;
 import java.util.UUID;
 
 import static org.teameugene.prison.Util.Utils.*;
 import static org.teameugene.prison.enums.Ore.oreToItem;
-import static org.teameugene.prison.items.ItemUtils.getItemUpgrades;
-import static org.teameugene.prison.items.ItemUtils.getLevel;
 import static org.teameugene.prison.items.Upgrades.*;
 import static org.teameugene.prison.npcs.NPC.showNPCS;
-import static org.teameugene.prison.scoreboard.ScoreBoard.displayScoreboard;
 
 public class PlayerListener implements org.bukkit.event.Listener {
 

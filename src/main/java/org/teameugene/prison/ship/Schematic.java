@@ -1,4 +1,4 @@
-package org.teameugene.prison.mine;
+package org.teameugene.prison.ship;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;

@@ -116,9 +116,13 @@ public abstract class NPC {
 
         ArmorSmith armorSmith = new ArmorSmith("Armor Smith", new Location(getWorldByName("world"), -1791, 30, 797), "appl3");
         armorSmith.setRotation(0, 90);
+
+        ShipMechanic shipMechanic = new ShipMechanic("Ship Mechanic", new Location(getWorldByName(Prison.moonWorldName), -1794, 30, 796), "appl3");
+
         npcs.add(moonMerchant);
         npcs.add(weaponForger);
         npcs.add(armorSmith);
+        npcs.add(shipMechanic);
     }
 
     private void setSkin(String name, GameProfile gameProfile) {

@@ -1,33 +1,21 @@
 package org.teameugene.prison.listeners;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.teameugene.prison.User;
 import org.teameugene.prison.database.Database;
-import org.teameugene.prison.enums.Upgrade;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 
-import static org.teameugene.prison.Util.RomanParser.intToRoman;
-import static org.teameugene.prison.Util.RomanParser.romanToInt;
 import static org.teameugene.prison.Util.Utils.*;
 import static org.teameugene.prison.items.ItemUtils.handleTeleportationAction;
 import static org.teameugene.prison.items.ItemUtils.handleUpgrade;
+import static org.teameugene.prison.ship.Ship.*;
 
 public class InventoryListener implements Listener {
 
@@ -52,6 +40,18 @@ public class InventoryListener implements Listener {
 
                 // Handle the upgrade logic here
                 handleUpgrade((Player) event.getWhoClicked(), event.getCurrentItem().getItemMeta().getDisplayName(), connectedPlayers);
+            }
+        }
+
+        else if (event.getView().getTitle().contains("Mechanic")) {
+            event.setCancelled(true);
+            if (event.getCurrentItem() != null &&
+                    event.getCurrentItem().getItemMeta() != null &&
+                    event.getCurrentItem().getItemMeta().hasLore() &&
+                    event.getCurrentItem().getItemMeta().getLore().get(0).startsWith("Cost:")) {
+
+                Player player = (Player) event.getWhoClicked();
+                handleShipGUIInteraction(player, event.getCurrentItem().getItemMeta().getDisplayName(), getUserFromPlayer(player, connectedPlayers));
             }
         }
 
