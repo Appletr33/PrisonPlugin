@@ -19,6 +19,7 @@ import org.teameugene.prison.database.Database;
 import java.util.ArrayList;
 
 import static org.teameugene.prison.Util.Utils.getUserFromPlayer;
+import static org.teameugene.prison.enums.CustomItem.*;
 import static org.teameugene.prison.items.ItemUtils.*;
 
 public class ItemListener implements Listener {
@@ -38,33 +39,17 @@ public class ItemListener implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (isPick(player.getInventory().getItemInMainHand())) {
-            if ((player.isSneaking() && event.getAction() == Action.RIGHT_CLICK_AIR) || (player.isSneaking() && event.getAction() == Action.RIGHT_CLICK_BLOCK))
-                openUpgradeGUI(player, player.getInventory().getItemInMainHand());
-        }
-
-        else if (isTeleport(player.getInventory().getItemInMainHand())) {
-            if (event.getAction() == Action.RIGHT_CLICK_AIR) {
-                openTeleportationGUI(player);
-            }
-
-            else if ((event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
-                // Cancel the event to prevent placing the redstone torch
-                event.setCancelled(true);
-                openTeleportationGUI(player);
-            }
-        }
+       if (isCustomItem(player.getInventory().getItemInMainHand())) {
+           handleToolLogic(event);
+       }
     }
 
     @EventHandler
     public void onDrop(PlayerDropItemEvent e) {
-        //Prevent dropping our pickaxe or teleporter
-        if (isTeleport(e.getItemDrop().getItemStack())) e.setCancelled(true);
-        else if (isPick(e.getItemDrop().getItemStack())) e.setCancelled(true);
-        else if (isSword(e.getItemDrop().getItemStack())) e.setCancelled(true);
+        if (isCustomItem(e.getItemDrop().getItemStack())) {
+            e.setCancelled(true);
+        }
     }
-
-
 
     @EventHandler
     public void onItemDamage(PlayerItemDamageEvent e) {

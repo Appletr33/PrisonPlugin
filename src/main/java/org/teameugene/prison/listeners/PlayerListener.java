@@ -4,9 +4,11 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -73,6 +75,7 @@ public class PlayerListener implements org.bukkit.event.Listener {
         showNPCS(event.getPlayer());
         PacketReader pr = new PacketReader(event.getPlayer());
         pr.inject();
+        applyContinuousArmorUpgrades(player);
     }
 
     @EventHandler
@@ -131,6 +134,19 @@ public class PlayerListener implements org.bukkit.event.Listener {
 
         getUserFromPlayer(player, connectedPlayers).addPoints(1);
         ItemStack itemUsed = player.getInventory().getItemInMainHand();
-        applyUpgrades(connectedPlayers, player, itemUsed, brokenBlock);
+        applyMiningUpgrades(connectedPlayers, player, itemUsed, brokenBlock);
+    }
+
+    @EventHandler
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        Entity attackerEntity = event.getDamager();
+        if (attackerEntity instanceof Player) {
+            Player attacker = (Player) attackerEntity;
+            applySwordUpgrades(attacker, attacker.getInventory().getItemInMainHand());
+            Entity targetEntity = event.getEntity();
+            if (targetEntity instanceof Player) {
+            } else {
+            }
+        }
     }
 }

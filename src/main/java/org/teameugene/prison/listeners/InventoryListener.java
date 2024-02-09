@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -24,8 +25,7 @@ import java.util.Objects;
 
 import static org.teameugene.prison.Util.RomanParser.intToRoman;
 import static org.teameugene.prison.Util.RomanParser.romanToInt;
-import static org.teameugene.prison.Util.Utils.getUserFromPlayer;
-import static org.teameugene.prison.Util.Utils.getWorldByName;
+import static org.teameugene.prison.Util.Utils.*;
 import static org.teameugene.prison.items.ItemUtils.handleTeleportationAction;
 import static org.teameugene.prison.items.ItemUtils.handleUpgrade;
 
@@ -43,10 +43,8 @@ public class InventoryListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (event.getView().getTitle().equals("Pickaxe Upgrade")) {
+        if (event.getView().getTitle().contains("Upgrade")) {
             event.setCancelled(true);
-
-            // Check if the clicked item is a diamond with the expected lore
             if (event.getCurrentItem() != null &&
                     event.getCurrentItem().getItemMeta() != null &&
                     event.getCurrentItem().getItemMeta().hasLore() &&
@@ -69,7 +67,10 @@ public class InventoryListener implements Listener {
                 handleTeleportationAction((Player) event.getWhoClicked(), event.getCurrentItem().getItemMeta().getDisplayName(), database);
             }
         }
+
+        // PREVENT ARMOR FROM BEING REMOVED
+        if(event.getSlotType() == InventoryType.SlotType.ARMOR) {
+            event.setCancelled(true);
+        }
     }
-
-
 }

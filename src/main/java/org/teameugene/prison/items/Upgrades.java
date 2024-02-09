@@ -15,6 +15,8 @@ import org.teameugene.prison.User;
 import org.teameugene.prison.enums.Upgrade;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.teameugene.prison.Util.Utils.*;
 import static org.teameugene.prison.items.ItemUtils.getItemUpgrades;
@@ -22,7 +24,7 @@ import static org.teameugene.prison.items.ItemUtils.getLevel;
 
 public class Upgrades {
 
-    public static void applyUpgrades( ArrayList<User> connectedPlayers, Player player, ItemStack itemUsed, Block brokenBlock) {
+    public static void applyMiningUpgrades( ArrayList<User> connectedPlayers, Player player, ItemStack itemUsed, Block brokenBlock) {
         ArrayList<Upgrade> itemUpgrades = getItemUpgrades(itemUsed);
 
         for (Upgrade upgrade : itemUpgrades) {
@@ -42,6 +44,38 @@ public class Upgrades {
             if (upgrade.equals(Upgrade.JUMP)) {
                 int level = getLevel(upgrade, itemUsed);
                 jumpUpgrade(player, level);
+            }
+        }
+    }
+
+    public static void applySwordUpgrades(Player player, ItemStack sword) {
+        ArrayList<Upgrade> itemUpgrades = getItemUpgrades(sword);
+        for (Upgrade upgrade : itemUpgrades) {
+            if (upgrade.equals(Upgrade.SPEED)) {
+                int level = getLevel(upgrade, sword);
+                speedUpgrade(player, level);
+            }
+        }
+    }
+
+    public static void applyContinuousArmorUpgrades(Player player) {
+        ItemStack[] armorItems = player.getInventory().getArmorContents();
+        Map<Upgrade, Integer> armorUpgrades = new HashMap<>();
+
+        // Collect all armor upgrades and their levels
+        for (ItemStack armorPiece : armorItems) {
+            for (Upgrade upgrade : getItemUpgrades(armorPiece)) {
+                armorUpgrades.put(upgrade, getLevel(upgrade, armorPiece));
+            }
+        }
+
+        for (Map.Entry<Upgrade, Integer> entry : armorUpgrades.entrySet()) {
+            Upgrade upgrade = entry.getKey();
+            int level = entry.getValue();
+
+            if (upgrade.equals(Upgrade.GODLY_OVERLOAD)) {
+                double maxHealth = 20 * (5 * 0.1 * level);
+                setPlayerMaxHealth(player, maxHealth);
             }
         }
     }

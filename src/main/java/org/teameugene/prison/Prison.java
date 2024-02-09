@@ -3,6 +3,7 @@ package org.teameugene.prison;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.teameugene.prison.Util.TextEntities;
 import org.teameugene.prison.database.Database;
 import org.teameugene.prison.listeners.InventoryListener;
 import org.teameugene.prison.listeners.ItemListener;
@@ -23,7 +24,7 @@ public final class Prison extends JavaPlugin {
 
     private static Prison instance;
     Mine mine;
-    Database database;
+    public static Database database;
     ArrayList<Schematic> schematics;
     public static final String shipWorldName = "shipworld";
     public static final String marsWorldName = "mars";
@@ -54,6 +55,9 @@ public final class Prison extends JavaPlugin {
 
         //Set Keep Inventory and time rules
         setRules();
+
+        //Initialize Text Entities
+        TextEntities.initialize();
 
         //Load Schematics
         schematics = Schematic.loadSchematics(this);
@@ -97,6 +101,10 @@ public final class Prison extends JavaPlugin {
 
         if (Bukkit.getWorld(marsWorldName) == null){
             new WorldCreator(marsWorldName).createWorld();
+        }
+
+        if (Bukkit.getWorld(moonWorldName) == null) {
+            new WorldCreator(moonWorldName).createWorld();
         }
 
         for (World world : Bukkit.getWorlds()) {

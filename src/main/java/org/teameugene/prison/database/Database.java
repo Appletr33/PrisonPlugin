@@ -1,6 +1,7 @@
 package org.teameugene.prison.database;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 
@@ -10,6 +11,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -231,5 +234,27 @@ public class Database {
                 e.printStackTrace();
             }
         }
+    }
+
+    public List<String> getLeaderboard(int topN) {
+        List<String> leaderboard = new ArrayList<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(
+                "SELECT player_uuid, points FROM players ORDER BY points DESC LIMIT ?")) {
+            statement.setInt(1, topN);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    UUID playerUUID = UUID.fromString(resultSet.getString("player_uuid"));
+                    long points = resultSet.getLong("points");
+                    String playerName = Bukkit.getOfflinePlayer(playerUUID).getName();
+                    leaderboard.add(playerName + " - credits: " + ChatColor.GOLD + points);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return leaderboard;
     }
 }

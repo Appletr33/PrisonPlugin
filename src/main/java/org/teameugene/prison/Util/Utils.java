@@ -1,21 +1,25 @@
 package org.teameugene.prison.Util;
 
 import net.minecraft.network.protocol.Packet;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_20_R2.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
+import org.checkerframework.checker.units.qual.A;
 import org.teameugene.prison.Prison;
 import org.teameugene.prison.User;
 import org.teameugene.prison.database.Database;
+import org.teameugene.prison.enums.CustomItem;
 import org.teameugene.prison.mine.Schematic;
 
 import java.io.File;
@@ -25,61 +29,25 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
+import static org.teameugene.prison.enums.CustomItem.createCustomItem;
 import static org.teameugene.prison.scoreboard.ScoreBoard.displayScoreboard;
 
 public class Utils {
 
     public static void giveItemsToPlayer(Player player) {
         // Give an unbreakable pickaxe in the first slot
-        ItemStack unbreakablePickaxe = createUnbreakablePickaxe();
-        player.getInventory().setItem(0, unbreakablePickaxe);
-
-        // Give a redstone torch in the last slot
-        ItemStack redstoneTorch = createRedstoneTorch();
-        player.getInventory().setItem(8, redstoneTorch);
-        player.getInventory().setItem(1, createCosmicSword());
-    }
-
-    private static ItemStack createUnbreakablePickaxe() {
-        ItemStack pickaxe = new ItemStack(Material.NETHERITE_PICKAXE);
-        ItemMeta pickaxeMeta = pickaxe.getItemMeta();
-        // Set custom name
-        pickaxeMeta.setDisplayName("Cosmic Pickaxe");
-        // Set lore
-        pickaxeMeta.setLore(java.util.Arrays.asList("Bestowed upon you by the heavens"));
-        // Add enchantment for durability
-        pickaxe.addEnchantment(Enchantment.DURABILITY, 3);
-
-        pickaxe.setItemMeta(pickaxeMeta);
-
-        return pickaxe;
-    }
-
-    private static ItemStack createCosmicSword() {
-        ItemStack cosmicSword = new ItemStack(Material.NETHERITE_SWORD);
-        ItemMeta cosmicSwordMeta = cosmicSword.getItemMeta();
-        // Set Name
-        cosmicSwordMeta.setDisplayName("Cosmic Sword");
-        // Set lore
-        cosmicSwordMeta.setLore(java.util.Arrays.asList("They say its strength is equal to the might of one's soul"));
-
-        cosmicSword.setItemMeta(cosmicSwordMeta);
-        return cosmicSword;
-    }
-
-    private static ItemStack createRedstoneTorch() {
-        ItemStack redstoneTorch = new ItemStack(Material.REDSTONE_TORCH);
-        ItemMeta torchMeta = redstoneTorch.getItemMeta();
-        // Set Name
-        torchMeta.setDisplayName("Teleporter");
-        // Set lore
-        torchMeta.setLore(java.util.Arrays.asList("Teleports you instantaneously!"));
-
-        redstoneTorch.setItemMeta(torchMeta);
-        return redstoneTorch;
+        player.getInventory().setItem(0, createCustomItem(CustomItem.COSMIC_PICKAXE));
+        player.getInventory().setItem(1, createCustomItem(CustomItem.COSMIC_SWORD));
+        player.getInventory().setItem(2, createCustomItem(CustomItem.COSMIC_BOW));
+        player.getInventory().setItem(8, createCustomItem(CustomItem.TELEPORTER));
+        player.getInventory().setHelmet(createCustomItem(CustomItem.COSMIC_HELMET));
+        player.getInventory().setChestplate(createCustomItem(CustomItem.COSMIC_CHESTPLATE));
+        player.getInventory().setLeggings(createCustomItem(CustomItem.COSMIC_LEGGINGS));
+        player.getInventory().setBoots(createCustomItem(CustomItem.COSMIC_BOOTS));
     }
 
     public static World getWorldByName(String worldName) {
@@ -278,4 +246,47 @@ public class Utils {
         }
         return result;
     }
+
+    // A method to create a unique key for the custom metadata
+    public static NamespacedKey getKey(String key) {
+        return new NamespacedKey(Prison.getInstance(), key);
+    }
+
+    public static boolean isArmorItem(Material material) {
+        return material == Material.LEATHER_HELMET ||
+                material == Material.LEATHER_CHESTPLATE ||
+                material == Material.LEATHER_LEGGINGS ||
+                material == Material.LEATHER_BOOTS ||
+                material == Material.IRON_HELMET ||
+                material == Material.IRON_CHESTPLATE ||
+                material == Material.IRON_LEGGINGS ||
+                material == Material.IRON_BOOTS ||
+                material == Material.GOLDEN_HELMET ||
+                material == Material.GOLDEN_CHESTPLATE ||
+                material == Material.GOLDEN_LEGGINGS ||
+                material == Material.GOLDEN_BOOTS ||
+                material == Material.DIAMOND_HELMET ||
+                material == Material.DIAMOND_CHESTPLATE ||
+                material == Material.DIAMOND_LEGGINGS ||
+                material == Material.DIAMOND_BOOTS ||
+                material == Material.NETHERITE_BOOTS ||
+                material == Material.NETHERITE_LEGGINGS ||
+                material == Material.NETHERITE_CHESTPLATE ||
+                material == Material.NETHERITE_HELMET;
+    }
+
+    public static void setPlayerMaxHealth(Player player, double maxHealth) {
+        // Ensure the max health is within valid range
+        maxHealth = Math.max(1, maxHealth); // Ensure maxHealth is not less than 1
+
+        // Set the player's maximum health attribute
+        player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+
+        // Set the player's current health to match the new max health
+        double currentHealth = player.getHealth();
+        if (currentHealth > maxHealth) {
+            player.setHealth(maxHealth);
+        }
+    }
+
 }

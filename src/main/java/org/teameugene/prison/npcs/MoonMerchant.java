@@ -15,8 +15,12 @@ import java.util.UUID;
 import static org.teameugene.prison.Util.Utils.getUserFromPlayer;
 
 public class MoonMerchant extends NPC {
+
+    private static NPC instance;
+
     public MoonMerchant(String name, Location location, String skinName) {
         super(name, location, skinName);
+        instance = this;
     }
 
     @Override
@@ -43,8 +47,8 @@ public class MoonMerchant extends NPC {
             player.sendMessage(ChatColor.GOLD + "<Moon Merchant>" + ChatColor.WHITE + " Head to the mine and get me some ores, will ya?!");
     }
 
-    @Override
-    protected void openGUI() {
-
+    public static NPC getInstance() {
+        return instance;
     }
+
 }

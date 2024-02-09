@@ -1,5 +1,6 @@
 package org.teameugene.prison.tasks;
 
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.teameugene.prison.User;
@@ -7,6 +8,7 @@ import org.teameugene.prison.database.Database;
 
 import java.util.ArrayList;
 
+import static org.teameugene.prison.Util.TextEntities.displayLeaderboard;
 import static org.teameugene.prison.Util.Utils.updateDatabase;
 import static org.teameugene.prison.scoreboard.ScoreBoard.displayScoreboard;
 
@@ -22,6 +24,7 @@ public class Tasks {
         // Update score boards
         new updateScoreBoards().runTaskTimer(plugin, 0, 10); // every 10 ticks
         new updateDatabasePlayerScores().runTaskTimer(plugin, 0, 20 * 30); // every 20 * 3 ticks (3 seconds)
+        new updateLeaderBoard().runTaskTimer(plugin, 0, 20 * 35); // every 20 * 35 ticks (35 seconds)
     }
 
     private class updateScoreBoards extends BukkitRunnable {
@@ -31,6 +34,14 @@ public class Tasks {
                 for (User user : connectedPlayers) {
                     displayScoreboard(user.getPlayer(), user.getPoints());
                 }
+        }
+    }
+
+    private class updateLeaderBoard extends BukkitRunnable {
+        @Override
+        public void run() {
+            if (database.isConnected())
+                displayLeaderboard();
         }
     }
 

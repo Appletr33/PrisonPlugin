@@ -16,6 +16,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Rotation;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_20_R2.CraftServer;
@@ -42,15 +43,23 @@ public abstract class NPC {
     int pitch = 0;
     int yaw = 180;
     int npcId;
+    String name;
 
     public NPC(String name, Location location, String skinName) {
         if (name.length() < 16) {
+            this.name = name;
             this.location = location;
             minecraftServer = ((CraftServer) Bukkit.getServer()).getServer();
             serverLevel = ((CraftWorld) location.getWorld()).getHandle();
 
             gameProfile = new GameProfile(UUID.randomUUID(), name);
-            setSkin(skinName, gameProfile);
+
+            try {
+                setSkin(skinName, gameProfile);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
 
             npc = new ServerPlayer(minecraftServer, serverLevel, gameProfile, ClientInformation.createDefault());
             npc.setPos(location.getX(), location.getY(), location.getZ());
@@ -67,7 +76,9 @@ public abstract class NPC {
 
     public abstract void interact(Player player);
 
-    protected abstract void openGUI();
+    public void sendMessage(Player player, ChatColor nameColor, String message) {
+        player.sendMessage(nameColor + "<" + name + ">" + " " + ChatColor.WHITE + message);
+    }
 
     public static void showNPCS(Player player) {
         for (NPC npcPlayer : npcs) {

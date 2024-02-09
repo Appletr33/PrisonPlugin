@@ -4,13 +4,19 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.teameugene.prison.User;
 import org.teameugene.prison.database.Database;
+import org.teameugene.prison.enums.CustomItem;
 import org.teameugene.prison.enums.Upgrade;
+import org.teameugene.prison.enums.UpgradeType;
+import org.teameugene.prison.npcs.ArmorSmith;
+import org.teameugene.prison.npcs.NPC;
+import org.teameugene.prison.npcs.WeaponForger;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -22,6 +28,8 @@ import static org.teameugene.prison.Util.RomanParser.intToRoman;
 import static org.teameugene.prison.Util.RomanParser.romanToInt;
 import static org.teameugene.prison.Util.Utils.getUserFromPlayer;
 import static org.teameugene.prison.Util.Utils.getWorldByName;
+import static org.teameugene.prison.enums.CustomItem.*;
+import static org.teameugene.prison.items.Upgrades.applyContinuousArmorUpgrades;
 
 public class ItemUtils {
     public static void openTeleportationGUI(Player player) {
@@ -58,33 +66,81 @@ public class ItemUtils {
         return upgrade.getEnchantmentValue() == null;
     }
 
-    public static int getLevel(Upgrade upgrade, ItemStack pickaxe) {
+    public static int getLevel(Upgrade upgrade, ItemStack itemStack) {
         if (bIsCustomUpgrade(upgrade)) {
-            return getCustomUpgradeLevel(upgrade, pickaxe);
+            return getCustomUpgradeLevel(upgrade, itemStack);
         } else {
-            return pickaxe.getEnchantmentLevel(upgrade.getEnchantmentValue());
+            return itemStack.getEnchantmentLevel(upgrade.getEnchantmentValue());
         }
     }
 
-    public static void openUpgradeGUI(Player player, ItemStack pickaxe) {
-        Inventory upgradeGUI = Bukkit.createInventory(player, 9, "Pickaxe Upgrade");
+    public static void openUpgradeGUI(Player player, UpgradeType upgradeType) {
+        String windowName = "";
+
+        if (upgradeType.equals(UpgradeType.TOOL))
+            windowName = "Tool Upgrade";
+        else if (upgradeType.equals(UpgradeType.ARMOR))
+            windowName = "Armor Upgrade";
+
+
+        Inventory upgradeGUI = Bukkit.createInventory(player, 9, windowName);
         String lorePre = "Cost: ";
         String lorePost= ChatColor.WHITE + " points";
 
-        int i = 2;
+        int guiSlot = 0;
         for (Upgrade upgrade : Upgrade.values()) {
-            int level = getLevel(upgrade, pickaxe);
-
-            String lore;
-            if (upgrade.getMaxLevel() >= level + 1) {
-                lore = (lorePre + ChatColor.GREEN + determineCost(upgrade, level) + lorePost);
-            } else {
-                lore = ChatColor.RED + "MAXED";
+            int level = 0;
+            CustomItem customItem = null;
+            if (upgradeType.equals(UpgradeType.TOOL)) {
+                switch (upgrade.getUpgradeType()) {
+                    case SWORD -> {
+                        customItem = COSMIC_SWORD;
+                    }
+                    case BOW -> {
+                        customItem = COSMIC_BOW;
+                    }
+                    case PICKAXE -> {
+                        customItem = COSMIC_PICKAXE;
+                    }
+                    case TOOL -> {
+                        customItem = COSMIC_SWORD;
+                    }
+                }
             }
 
-            upgradeGUI.setItem(i, createItemGUI(upgrade.getColor() + upgrade.getStringValue(), lore, upgrade.getMaterial()));
-            i++;
+            else if (upgradeType.equals(UpgradeType.ARMOR)){
+                switch (upgrade.getUpgradeType()) {
+                    case HELMET -> {
+                        customItem = COSMIC_HELMET;
+                    }
+                    case CHESTPLATE -> {
+                        customItem = COSMIC_CHESTPLATE;
+                    }
+                    case LEGGINGS -> {
+                        customItem = COSMIC_LEGGINGS;
+                    }
+                    case BOOTS -> {
+                        customItem = COSMIC_BOOTS;
+                    }
+                    case ARMOR -> {
+                        customItem = COSMIC_BOOTS;
+                    }
+                }
+            }
+
+            if (customItem != null) {
+                level = getLevel(upgrade, getCustomItemFromPlayersInventory(player, customItem));
+                String lore;
+                if (upgrade.getMaxLevel() >= level + 1) {
+                    lore = (lorePre + ChatColor.GREEN + determineCost(upgrade, level) + lorePost);
+                } else {
+                    lore = ChatColor.RED + "MAXED";
+                }
+                upgradeGUI.setItem(guiSlot, createItemGUI(upgrade.getColor() + upgrade.getStringValue(), lore, upgrade.getMaterial()));
+                guiSlot++;
+            }
         }
+
         // Open the GUI for the player
         player.openInventory(upgradeGUI);
     }
@@ -219,64 +275,59 @@ public class ItemUtils {
 
     public static void handleUpgrade(Player player, String upgradeName, ArrayList<User> connectedPlayers) {
         // Get the player's pickaxe
-        Upgrade upgrade = Objects.requireNonNull(Upgrade.fromStringValue(upgradeName.substring(2))); //Remove Coloring from clicked upgrade and get the upgrade from that string vlaue
-        ItemStack pickaxe = player.getInventory().getItemInMainHand();
-        int level = getLevel(upgrade, pickaxe);
+        Upgrade upgrade = Objects.requireNonNull(Upgrade.fromStringValue(upgradeName.substring(2))); //Remove Coloring from clicked upgrade and get the upgrade from that string value
+
+        ArrayList<ItemStack> itemsToUpgrade = new ArrayList<>();
+        ArrayList<ItemStack> customItems = getAllCustomItemsFromPlayersInventory(player);
+
+        for (ItemStack item : customItems ) {
+            if (itemStackToCustomItem(item).getUpgradeGroup() == upgrade.getUpgradeType())
+                itemsToUpgrade.add(item);
+            else if ((itemStackToCustomItem(item).getUpgradeType() == upgrade.getUpgradeType()))
+                itemsToUpgrade.add(item);
+        }
+
+        ChatColor npcNameColor = ChatColor.WHITE;
+        NPC npcInteracting = null;
+
+        if (UpgradeType.getUpgradeGroup(upgrade) == UpgradeType.TOOL) {
+            npcInteracting = WeaponForger.getInstance();
+            npcNameColor = ChatColor.GREEN;
+        }
+        else if (UpgradeType.getUpgradeGroup(upgrade) == UpgradeType.ARMOR){
+            npcInteracting = ArmorSmith.getInstance();
+            npcNameColor = ChatColor.DARK_PURPLE;
+        }
+
+        String message = "";
+        int level = getLevel(upgrade, itemsToUpgrade.get(0));
         long cost = determineCost(upgrade, level);
         User connectedPlayer = getUserFromPlayer(player, connectedPlayers);
         if (connectedPlayer != null) {
             if (upgrade.getMaxLevel() >= level + 1) {
                 if (connectedPlayer.subtractPoints(cost)) {
-                    player.sendMessage("Upgrade Applied!");
-                    if (bIsCustomUpgrade(upgrade)) {
-                        applyCustomUpgrade(pickaxe, upgrade.getColor(), upgrade, level + 1);
-                    } else {
-                        pickaxe.addUnsafeEnchantment(upgrade.getEnchantmentValue(), level + 1);
+                    message = "Upgrade Applied!";
+                    for (ItemStack item : itemsToUpgrade) {
+                        if (bIsCustomUpgrade(upgrade)) {
+                            applyCustomUpgrade(item, upgrade.getColor(), upgrade, level + 1);
+                        } else {
+                            item.addUnsafeEnchantment(upgrade.getEnchantmentValue(), level + 1);
+                        }
                     }
-
+                    applyContinuousArmorUpgrades(player);
+                    openUpgradeGUI(player, UpgradeType.getUpgradeGroup(upgrade));
                 } else {
-                    player.sendMessage("You Cannot Afford This Upgrade! You need §c" + (cost - connectedPlayer.getPoints()) + "§f" + " more points!");
+                    message = "You Cannot Afford This Upgrade! You need §c" + (cost - connectedPlayer.getPoints()) + "§f" + " more points!";
+                    player.closeInventory();
                 }
-            } else {
-                player.sendMessage("Max Level For This Upgrade Reached!");
+                } else {
+                    message = "Max Level For This Upgrade Reached!";
+                    player.closeInventory();
             }
         }
-
-        // Close the GUI
-        player.closeInventory();
+        npcInteracting.sendMessage(player, npcNameColor, message);
     }
 
-    public static boolean isTeleport(ItemStack item) {
-        // Check if the item has the desired display name and lore
-        if (item != null && item.getType() == Material.REDSTONE_TORCH && item.hasItemMeta()) {
-            ItemMeta meta = item.getItemMeta();
-            if (meta.hasDisplayName() && meta.hasLore()) {
-                return meta.getDisplayName().equals("Teleporter") && meta.getLore().contains("Teleports you instantaneously!");
-            }
-        }
-        return false;
-    }
-
-    public static boolean isSword(ItemStack item) {
-        if (item != null && item.getType() == Material.NETHERITE_SWORD && item.hasItemMeta()) {
-            ItemMeta meta = item.getItemMeta();
-            if (meta.hasDisplayName() && meta.hasLore()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean isPick(ItemStack item) {
-        // Check if the item has the desired display name and lore
-        if (item != null && item.getType() == Material.NETHERITE_PICKAXE && item.hasItemMeta()) {
-            ItemMeta meta = item.getItemMeta();
-            if (meta.hasDisplayName() && meta.hasLore()) {
-                return meta.getDisplayName().equals("Cosmic Pickaxe") && meta.getLore().contains("Bestowed upon you by the heavens");
-            }
-        }
-        return false;
-    }
 
     public static ArrayList<Upgrade> getItemUpgrades(ItemStack item) {
         ArrayList<Upgrade> upgradeList = new ArrayList<>();
