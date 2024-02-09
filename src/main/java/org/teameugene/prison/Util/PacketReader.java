@@ -1,4 +1,4 @@
-package org.teameugene.prison;
+package org.teameugene.prison.Util;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_20_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.teameugene.prison.Prison;
 import org.teameugene.prison.events.RightClickNPC;
 import org.teameugene.prison.npcs.NPC;
 

@@ -4,12 +4,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.teameugene.prison.User;
+import org.teameugene.prison.Util.User;
 import org.teameugene.prison.database.Database;
 import org.teameugene.prison.enums.CustomItem;
 import org.teameugene.prison.enums.Upgrade;
@@ -18,7 +17,6 @@ import org.teameugene.prison.npcs.ArmorSmith;
 import org.teameugene.prison.npcs.NPC;
 import org.teameugene.prison.npcs.WeaponForger;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -314,7 +312,7 @@ public class ItemUtils {
                             item.addUnsafeEnchantment(upgrade.getEnchantmentValue(), level + 1);
                         }
                     }
-                    applyContinuousArmorUpgrades(player);
+                    applyContinuousArmorUpgrades(player); // update godly overload and such so the player gets the increased health
                     openUpgradeGUI(player, UpgradeType.getUpgradeGroup(upgrade));
                 } else {
                     message = "You Cannot Afford This Upgrade! You need §c" + (cost - connectedPlayer.getPoints()) + "§f" + " more points!";

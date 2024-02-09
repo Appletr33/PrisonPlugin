@@ -4,6 +4,7 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.teameugene.prison.Util.TextEntities;
+import org.teameugene.prison.Util.User;
 import org.teameugene.prison.database.Database;
 import org.teameugene.prison.listeners.InventoryListener;
 import org.teameugene.prison.listeners.ItemListener;

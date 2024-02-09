@@ -9,9 +9,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.Vector;
 import org.teameugene.prison.Prison;
-import org.teameugene.prison.User;
+import org.teameugene.prison.Util.User;
 import org.teameugene.prison.enums.Upgrade;
 
 import java.util.ArrayList;

@@ -15,8 +15,8 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.teameugene.prison.PacketReader;
-import org.teameugene.prison.User;
+import org.teameugene.prison.Util.PacketReader;
+import org.teameugene.prison.Util.User;
 import org.teameugene.prison.database.Database;
 import org.teameugene.prison.ship.Schematic;
 

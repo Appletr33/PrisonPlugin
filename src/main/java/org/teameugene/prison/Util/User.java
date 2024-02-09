@@ -1,4 +1,4 @@
-package org.teameugene.prison;
+package org.teameugene.prison.Util;
 
 import org.bukkit.entity.Player;
 

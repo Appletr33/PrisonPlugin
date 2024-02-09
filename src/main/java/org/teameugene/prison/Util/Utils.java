@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.teameugene.prison.Prison;
-import org.teameugene.prison.User;
 import org.teameugene.prison.database.Database;
 import org.teameugene.prison.enums.CustomItem;
 import org.teameugene.prison.ship.Schematic;

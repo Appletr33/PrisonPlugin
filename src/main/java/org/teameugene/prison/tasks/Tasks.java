@@ -1,9 +1,8 @@
 package org.teameugene.prison.tasks;
 
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.teameugene.prison.User;
+import org.teameugene.prison.Util.User;
 import org.teameugene.prison.database.Database;
 
 import java.util.ArrayList;

@@ -5,11 +5,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.teameugene.prison.User;
+import org.teameugene.prison.Util.User;
 import org.teameugene.prison.npcs.NPC;
 import org.teameugene.prison.npcs.ShipMechanic;
-
-import java.awt.*;
 
 import static org.teameugene.prison.items.ItemUtils.createItemGUI;
 

@@ -7,7 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.plugin.Plugin;
-import org.teameugene.prison.User;
+import org.teameugene.prison.Util.User;
 import org.teameugene.prison.database.Database;
 
 import java.util.ArrayList;
