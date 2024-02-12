@@ -15,10 +15,12 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.teameugene.prison.Prison;
 import org.teameugene.prison.Util.PacketReader;
 import org.teameugene.prison.Util.User;
 import org.teameugene.prison.database.Database;
 import org.teameugene.prison.ship.Schematic;
+import oshi.jna.platform.mac.SystemB;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -64,6 +66,7 @@ public class PlayerListener implements org.bukkit.event.Listener {
          /*
                         END NEW PLAYER LOGIC
          */
+
         initPlayer(database, player, connectedPlayers);
         showNPCS(event.getPlayer());
         PacketReader pr = new PacketReader(event.getPlayer());
@@ -90,7 +93,7 @@ public class PlayerListener implements org.bukkit.event.Listener {
         connectedPlayers.removeIf(user -> user.getUUID().equals(playerUUID));
 
         //Set players pos back to spawn
-        player.teleport(getWorldByName("world").getSpawnLocation());
+        player.teleport(getWorldByName(Prison.moonWorldName).getSpawnLocation());
     }
 
     @EventHandler
@@ -118,10 +121,12 @@ public class PlayerListener implements org.bukkit.event.Listener {
         event.setDropItems(false);
 
         if (brokenBlock.getType() != Material.STONE) {
-            ItemStack[] drops = brokenBlock.getDrops().toArray(new ItemStack[0]);
-            for (ItemStack drop : drops) {
-                drop = oreToItem(drop);
-                addItemOrDrop(player, drop);
+            if (isInRegion(brokenBlock.getLocation(), Prison.mine.corner1, Prison.mine.corner2)) {
+                ItemStack[] drops = brokenBlock.getDrops().toArray(new ItemStack[0]);
+                for (ItemStack drop : drops) {
+                    drop = oreToItem(drop);
+                    addItemOrDrop(player, drop);
+                }
             }
         }
 

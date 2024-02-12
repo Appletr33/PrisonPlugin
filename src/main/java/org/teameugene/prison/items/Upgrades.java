@@ -73,7 +73,7 @@ public class Upgrades {
             int level = entry.getValue();
 
             if (upgrade.equals(Upgrade.GODLY_OVERLOAD)) {
-                double maxHealth = 20 * (5 * 0.1 * level);
+                double maxHealth = 20 + (5 * 0.1 * level);
                 setPlayerMaxHealth(player, maxHealth);
             }
         }
@@ -81,8 +81,8 @@ public class Upgrades {
 
     private static int detonateBlocks(Block brokenBlock, int level, Player player, ArrayList<User> connectedPlayers) {
         World world = brokenBlock.getWorld();
-        Location corner1 = Prison.corner1;
-        Location corner2 = Prison.corner2;
+        Location corner1 = Prison.mine.corner1;
+        Location corner2 = Prison.mine.corner2;
 
         BlockFace blockFace = determineBlockFace(player);
         return mineSquare(player, blockFace, brokenBlock, level, corner1, corner2);

@@ -8,6 +8,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.teameugene.prison.Prison;
 
 import java.util.Random;
 
@@ -16,18 +17,17 @@ import static org.teameugene.prison.Util.Utils.*;
 public class Mine {
 
     private long regenationTime = 1;
-    String worldName = "world";
     private int warnCount = 0;
-    private final int maxWarnCount = 10;
+    private final int maxWarnCount = 2;
     Plugin plugin;
     World world;
 
-    Location corner1;
-    Location corner2;
+    public Location corner1;
+    public Location corner2;
 
     public Mine(Plugin plugin, Location corner1, Location corner2) {
         this.plugin = plugin;
-        world = Bukkit.getWorld(worldName);
+        world = Bukkit.getWorld(Prison.moonWorldName);
         this.corner1 = corner1;
         this.corner2 = corner2;
 
@@ -41,7 +41,7 @@ public class Mine {
             @Override
             public void run() {
                 //1 min warning
-                broadcastMessageInWorld(getWorldByName(worldName), "§6New ore will rise from the mine in 60 seconds!");
+                broadcastMessageInWorld(getWorldByName(Prison.moonWorldName), "§6New ore will rise from the mine in 60 seconds!");
 
                 //Warning Task
                 new BukkitRunnable() {
@@ -59,7 +59,7 @@ public class Mine {
                             cancel();
                         }
                     }
-                }.runTaskTimer(plugin, 20 * 50, 20 * 1);
+                }.runTaskTimer(plugin, 20 * 50, 20 * 5);
 
                 //Regen Task
                 new BukkitRunnable() {
@@ -73,7 +73,7 @@ public class Mine {
     }
 
     private void broadcastWarning() {
-        broadcastMessageInWorld(getWorldByName(worldName),"New Ore Arriving in §4" + (maxWarnCount - warnCount) + "§fs!");
+        broadcastMessageInWorld(getWorldByName(Prison.moonWorldName),"New Ore Arriving in §4" + (maxWarnCount - warnCount) + "§fs!");
     }
 
     private void regenerateMine() {

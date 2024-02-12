@@ -108,13 +108,13 @@ public abstract class NPC {
 
     public static void setupNPCS() {
         // Moon NPCS //
-        MoonMerchant moonMerchant = new MoonMerchant("Moon Merchant", new Location(getWorldByName("world"), -1791, 30, 795), "hijl");
+        MoonMerchant moonMerchant = new MoonMerchant("Moon Merchant", new Location(getWorldByName(Prison.moonWorldName), -1791, 30, 795), "hijl");
         moonMerchant.setRotation(0, 90);
 
-        WeaponForger weaponForger = new WeaponForger("Weapon Forger", new Location(getWorldByName("world"), -1791, 30, 796), "appl3");
+        WeaponForger weaponForger = new WeaponForger("Weapon Forger", new Location(getWorldByName(Prison.moonWorldName), -1791, 30, 796), "appl3");
         weaponForger.setRotation(0, 90);
 
-        ArmorSmith armorSmith = new ArmorSmith("Armor Smith", new Location(getWorldByName("world"), -1791, 30, 797), "appl3");
+        ArmorSmith armorSmith = new ArmorSmith("Armor Smith", new Location(getWorldByName(Prison.moonWorldName), -1791, 30, 797), "appl3");
         armorSmith.setRotation(0, 90);
 
         ShipMechanic shipMechanic = new ShipMechanic("Ship Mechanic", new Location(getWorldByName(Prison.moonWorldName), -1794, 30, 796), "appl3");

@@ -2,75 +2,78 @@ package org.teameugene.prison;
 
 import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.teameugene.prison.Util.PacketReader;
 import org.teameugene.prison.Util.TextEntities;
 import org.teameugene.prison.Util.User;
 import org.teameugene.prison.database.Database;
-import org.teameugene.prison.listeners.InventoryListener;
-import org.teameugene.prison.listeners.ItemListener;
-import org.teameugene.prison.listeners.NPCInteractListener;
-import org.teameugene.prison.listeners.PlayerListener;
+import org.teameugene.prison.listeners.*;
 import org.teameugene.prison.mine.Mine;
 import org.teameugene.prison.ship.Schematic;
 import org.teameugene.prison.npcs.NPC;
 import org.teameugene.prison.tasks.Tasks;
-import org.teameugene.prison.worlds.mars.Mars;
+import org.teameugene.prison.worlds.EmptyVoidChunkGenerator;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import static org.teameugene.prison.Util.Utils.*;
 
-public final class Prison extends JavaPlugin {
+public final class Prison extends JavaPlugin implements Listener {
 
     private static Prison instance;
-    Mine mine;
+    public static Mine mine;
     public static Database database;
     ArrayList<Schematic> schematics;
     public static final String shipWorldName = "shipworld";
     public static final String marsWorldName = "mars";
-    public static final String moonWorldName = "world";
+    public static final String moonWorldName = "moon";
+    public static boolean worldInitialization = false;
+    public boolean reloaded = false;
     public static final ArrayList<User> connectedPlayers = new ArrayList<>();
     public static final Random random = new Random();
-
-    public static final Location corner1 = new Location(getWorldByName("world"), -1729, 20, 768);
-    public static final Location corner2 = new Location(getWorldByName("world"), -1776, 0, 815);
 
     @Override
     public void onEnable() {
         instance = this;
-        getLogger().info("[STARTING]: Initializing Main Prison Plugin");
-
-        //Plugin Initialization Logic
-
-        //Connect to database
+        // Pre-World Initialization
+        getLogger().info("");
+        getLogger().info("[START-UP]: (STARTED) Prison Initialization");
+        getLogger().info("");
+        //Register listener for world loading
+        getServer().getPluginManager().registerEvents(this, this);
+        //Init Database connection
         database = new Database(this);
-
-        //Set Random Seed
+        //Set random seed for random actions
         random.setSeed(System.currentTimeMillis() + 1349832);
+        //Load Schematics
+        schematics = Schematic.loadSchematics(this);
+        getLogger().info("[START-UP]: (Finished) Prison Initialization");
+        if (reloaded) Initialize();
+    }
 
-        //Initialize activePlayers ArrayList
+    public void Initialize() {
+        getLogger().info("[POST-WORLD]: (STARTED) Prison Initialization");
+        //Reinitialize players on /reload
         for (Player player : Bukkit.getOnlinePlayers()) {
             initPlayer(database, player, connectedPlayers);
+            PacketReader pr = new PacketReader(player);
+            pr.inject();
         }
-
-        //Set Keep Inventory and time rules
-        setRules();
 
         //Initialize Text Entities
         TextEntities.initialize();
-
-        //Load Schematics
-        schematics = Schematic.loadSchematics(this);
-
         //Create new mine
-        mine = new Mine(this, corner1, corner2);
-
+        mine = new Mine(this, new Location(getWorldByName(moonWorldName), -1729, 20, 768), new Location(getWorldByName(moonWorldName), -1776, 0, 815));
+        //Spawn our NPCS
+        NPC.setupNPCS();
         //Load tasks which depend on database connection being established
         new Tasks(this, database, connectedPlayers);
-
-        //Register Other Planets
-        Mars mars = new Mars(this);
 
         //Register Listeners
         getServer().getPluginManager().registerEvents(new PlayerListener(this, database, schematics, shipWorldName, connectedPlayers), this);
@@ -78,10 +81,23 @@ public final class Prison extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new InventoryListener(this, database, connectedPlayers), this);
         getServer().getPluginManager().registerEvents(new NPCInteractListener(), this);
 
-        //Spawn our NPCS
-        NPC.setupNPCS();
+        getLogger().info("[POST-WORLD]: (FINISHED) Prison Initialization");
+        getLogger().info("");
+        getLogger().info("");
+        getLogger().info("/////////////////////////////////////");
+        getLogger().info("[COMPLETE]: Main Prison Plugin Active");
+        getLogger().info("/////////////////////////////////////");
+        getLogger().info("");
+        getLogger().info("");
+    }
 
-        getLogger().info("[COMPLETED]: Finished Initializing Main Prison Plugin");
+    @EventHandler
+    public void onWorldLoad(WorldLoadEvent event) {
+        if (!worldInitialization) {
+            worldInitialization = true; // this shit has to be first otherwise onWorldLoad gets called a ton in response
+            setupWorlds();
+            Initialize();
+        }
     }
 
     public static Prison getInstance() {
@@ -95,17 +111,18 @@ public final class Prison extends JavaPlugin {
         database.closeConnection();
     }
 
-    private void setRules() {
-        if (Bukkit.getWorld(shipWorldName) == null){
-            new WorldCreator(shipWorldName).createWorld();
-        }
+    private void setupWorlds() {
+        List<String> worldNames = new ArrayList<>();
+        worldNames.add(marsWorldName);
+        worldNames.add(moonWorldName);
+        worldNames.add(shipWorldName);
 
-        if (Bukkit.getWorld(marsWorldName) == null){
-            new WorldCreator(marsWorldName).createWorld();
-        }
+        for (String worldName : worldNames) {
+            WorldCreator worldCreator = new WorldCreator(worldName);
 
-        if (Bukkit.getWorld(moonWorldName) == null) {
-            new WorldCreator(moonWorldName).createWorld();
+            // Set the chunk generator for the world
+            worldCreator.generator(new EmptyVoidChunkGenerator());
+            Bukkit.createWorld(worldCreator);
         }
 
         for (World world : Bukkit.getWorlds()) {
@@ -113,15 +130,22 @@ public final class Prison extends JavaPlugin {
             world.setGameRule(GameRule.MOB_GRIEFING, false);
             world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
             world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
+            world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
             world.setStorm(false);
         }
-        getWorldByName("world").setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
-        getWorldByName("world").setTime(13000); // just before sunset
+
+        getWorldByName(moonWorldName).setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+        getWorldByName(moonWorldName).setTime(13000); // just before sunset
 
         getWorldByName(shipWorldName).setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
         getWorldByName(shipWorldName).setTime(18000); // 12am
 
         getWorldByName(marsWorldName).setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
         getWorldByName(marsWorldName).setTime(9000); // 12am
+    }
+
+    @Override
+    public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
+        return new EmptyVoidChunkGenerator();
     }
 }

@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.teameugene.prison.Prison;
 import org.teameugene.prison.Util.User;
 import org.teameugene.prison.database.Database;
 import org.teameugene.prison.enums.CustomItem;
@@ -16,6 +17,7 @@ import org.teameugene.prison.enums.UpgradeType;
 import org.teameugene.prison.npcs.ArmorSmith;
 import org.teameugene.prison.npcs.NPC;
 import org.teameugene.prison.npcs.WeaponForger;
+import oshi.jna.platform.mac.SystemB;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -187,14 +189,14 @@ public class ItemUtils {
 
     public static void handleTeleportationAction(Player player, String destination, Database database) {
         if (destination.equals("§4Mars")) {
-            player.teleport(getWorldByName("mars").getSpawnLocation());
+            player.teleport(getWorldByName(Prison.marsWorldName).getSpawnLocation());
         }
         else if (destination.equals("§6Moon")) {
-            player.teleport(getWorldByName("world").getSpawnLocation());
+            player.teleport(getWorldByName(Prison.moonWorldName).getSpawnLocation());
         }
         else if (destination.equals("§2Ship")) {
             double[] pos = database.getPlayerShipCoordinates(player.getUniqueId());
-            player.teleport(new Location(getWorldByName("shipworld"), pos[0], pos[1], pos[2]));
+            player.teleport(new Location(getWorldByName(Prison.shipWorldName), pos[0], pos[1], pos[2]));
         }
     }
 
