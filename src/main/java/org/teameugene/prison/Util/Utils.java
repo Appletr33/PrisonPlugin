@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Scanner;
 
 import static org.teameugene.prison.enums.CustomItem.createCustomItem;
@@ -274,6 +275,24 @@ public class Utils {
         if (currentHealth > maxHealth) {
             player.setHealth(maxHealth);
         }
+    }
+
+    public static String getSubstringBeforeCharacter(String inputString, char specificCharacter) {
+        int index = inputString.indexOf(specificCharacter);
+        if (index != -1) {
+            return inputString.substring(0, index);
+        } else {
+            return inputString; // Return the entire string if the character is not found
+        }
+    }
+
+    public static <K, V> K getKeyByValue(Map<K, V> map, V value) {
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            if (value.equals(entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return null; // Return null if the value is not found
     }
 
 }

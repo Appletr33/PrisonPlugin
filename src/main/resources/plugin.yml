@@ -4,3 +4,5 @@ main: org.teameugene.prison.Prison
 api-version: 1.20
 load: STARTUP
 authors: [ Xander, Isaac, Johnathan ]
+commands:
+  map:

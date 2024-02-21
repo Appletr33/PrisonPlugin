@@ -7,9 +7,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.teameugene.prison.Util.PacketReader;
-import org.teameugene.prison.Util.TextEntities;
-import org.teameugene.prison.Util.User;
+import org.teameugene.prison.Util.*;
+import org.teameugene.prison.commands.MapCommand;
 import org.teameugene.prison.database.Database;
 import org.teameugene.prison.listeners.*;
 import org.teameugene.prison.mine.Mine;
@@ -18,8 +17,10 @@ import org.teameugene.prison.npcs.NPC;
 import org.teameugene.prison.tasks.Tasks;
 import org.teameugene.prison.worlds.EmptyVoidChunkGenerator;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 import static org.teameugene.prison.Util.Utils.*;
@@ -53,6 +54,11 @@ public final class Prison extends JavaPlugin implements Listener {
         random.setSeed(System.currentTimeMillis() + 1349832);
         //Load Schematics
         schematics = Schematic.loadSchematics(this);
+        try {
+            CustomMaps.Initialize();
+        } catch (FileNotFoundException | Execeptions.DirectoryNotFoundException e) {
+            e.printStackTrace();
+        }
         getLogger().info("[START-UP]: (Finished) Prison Initialization");
         if (reloaded) Initialize();
     }
@@ -80,6 +86,10 @@ public final class Prison extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new ItemListener(this, database, shipWorldName, connectedPlayers), this);
         getServer().getPluginManager().registerEvents(new InventoryListener(this, database, connectedPlayers), this);
         getServer().getPluginManager().registerEvents(new NPCInteractListener(), this);
+        getServer().getPluginManager().registerEvents(new MapListener(), this);
+
+        //Register Commands
+        Objects.requireNonNull(getCommand("map")).setExecutor(new MapCommand());
 
         getLogger().info("[POST-WORLD]: (FINISHED) Prison Initialization");
         getLogger().info("");
