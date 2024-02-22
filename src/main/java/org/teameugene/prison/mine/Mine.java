@@ -77,10 +77,10 @@ public class Mine {
     }
 
     private void regenerateMine() {
-        plugin.getLogger().info("[INFO]: Regenerating Mine");
+        //plugin.getLogger().info("[INFO]: Regenerating Mine");
         checkPlayerLocations();
         regenerateBlocks();
-        plugin.getLogger().info("[INFO]: Mine Successfully Regenerated");
+        //plugin.getLogger().info("[INFO]: Mine Successfully Regenerated");
     }
 
     private void checkPlayerLocations() {

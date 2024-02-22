@@ -9,6 +9,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.plugin.Plugin;
 import org.teameugene.prison.Util.User;
 import org.teameugene.prison.database.Database;
+import org.teameugene.prison.ship.Radar;
 
 import java.util.ArrayList;
 
@@ -42,7 +43,6 @@ public class InventoryListener implements Listener {
                 handleUpgrade((Player) event.getWhoClicked(), event.getCurrentItem().getItemMeta().getDisplayName(), connectedPlayers);
             }
         }
-
         else if (event.getView().getTitle().contains("Mechanic")) {
             event.setCancelled(true);
             if (event.getCurrentItem() != null &&
@@ -54,7 +54,6 @@ public class InventoryListener implements Listener {
                 handleShipGUIInteraction(player, event.getCurrentItem().getItemMeta().getDisplayName(), getUserFromPlayer(player, connectedPlayers));
             }
         }
-
         else if (event.getView().getTitle().equals("Warps")) {
             event.setCancelled(true);
             if (event.getCurrentItem() != null &&
@@ -66,6 +65,10 @@ public class InventoryListener implements Listener {
                 // Handle the upgrade logic here
                 handleTeleportationAction((Player) event.getWhoClicked(), event.getCurrentItem().getItemMeta().getDisplayName(), database);
             }
+        }
+        else if (event.getView().getTitle().equals("Radar")) {
+            event.setCancelled(true);
+            Radar.handleGUI(event);
         }
 
         // PREVENT ARMOR FROM BEING REMOVED

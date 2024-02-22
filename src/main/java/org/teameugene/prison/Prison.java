@@ -87,6 +87,7 @@ public final class Prison extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new InventoryListener(this, database, connectedPlayers), this);
         getServer().getPluginManager().registerEvents(new NPCInteractListener(), this);
         getServer().getPluginManager().registerEvents(new MapListener(), this);
+        getServer().getPluginManager().registerEvents(new ItemFrameListener(), this);
 
         //Register Commands
         Objects.requireNonNull(getCommand("map")).setExecutor(new MapCommand());

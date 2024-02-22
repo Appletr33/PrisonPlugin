@@ -6,6 +6,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_20_R2.entity.CraftPlayer;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -19,8 +20,11 @@ import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Scanner;
 
+import static org.teameugene.prison.Util.CustomMaps.getMapItem;
+import static org.teameugene.prison.Util.TextEntities.spawnTextEntity;
 import static org.teameugene.prison.enums.CustomItem.createCustomItem;
 import static org.teameugene.prison.scoreboard.ScoreBoard.displayScoreboard;
 
@@ -71,9 +75,24 @@ public class Utils {
         double[] pos = database.getPlayerShipCoordinates(player.getUniqueId());
         for (Schematic schematic : schematicArrayList) {
             if (schematic.getName().equals(starterShipSchematicName + ".schem")) {
-                schematic.paste(new Location(getWorldByName(shipWorldName), pos[0] - 14, pos[1] - 5, pos[2])); //-14 and -5 are offset values for the schematic so the player spawns on the ship
+                schematic.paste(new Location(getWorldByName(shipWorldName), pos[0] - 14 + 27, pos[1] - 5 +6, pos[2] + 9)); //offset values for the schematic so the player spawns on the ship
+                Location radarLocation = new Location(getWorldByName(shipWorldName), pos[0], pos[1] + 1, pos[2] -5);
+                setItemFrameImage(radarLocation, "control_panel");
+                radarLocation.setY(radarLocation.getY() + 0.5);
+                radarLocation.setX(radarLocation.getX() + 0.5);
+                radarLocation.setZ(radarLocation.getZ() + 0.5);
+                spawnTextEntity(radarLocation, "§b§nRight Click", "radar");
+                radarLocation.setY(radarLocation.getY() + 0.25);
+                spawnTextEntity(radarLocation, "§4§lRadar", "radar");
             }
         }
+    }
+
+    private static void setItemFrameImage(Location location, String mapName) {
+        ItemFrame frame = (ItemFrame) Objects.requireNonNull(location.getWorld()).spawn(
+                location.getWorld().getBlockAt(location).getLocation(),
+                ItemFrame.class);
+        frame.setItem(getMapItem(mapName, location.getWorld()));
     }
 
     public static boolean isInRegion(Location source, Location bound1, Location bound2) {

@@ -12,6 +12,9 @@ import org.teameugene.prison.npcs.ShipMechanic;
 import static org.teameugene.prison.items.ItemUtils.createItemGUI;
 
 public class Ship {
+
+    public static final String starterShipSchematicName = "ship2";
+
     public static void openShipUpgradeGUI(Player player) {
         Inventory upgradeGUI = Bukkit.createInventory(player, 9, "Ship Mechanic");
 

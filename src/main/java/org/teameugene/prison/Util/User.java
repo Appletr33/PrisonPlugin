@@ -7,6 +7,7 @@ import java.util.UUID;
 public class User {
     private long points;
     private Player player;
+    private boolean radarActive = false;
 
     public User(long points, Player player) {
         this.points = points;
@@ -39,6 +40,14 @@ public class User {
 
     public Player getPlayer() {
         return this.player;
+    }
+
+    public boolean getRadarActive() {
+        return radarActive;
+    }
+
+    public void toggleRadarActive() {
+        radarActive = !radarActive;
     }
 
 }

@@ -25,7 +25,7 @@ public class TextEntities {
         textObjects.put(leaderboardIdentifier, getTextEntities(getWorldByName(Prison.moonWorldName), leaderboardIdentifier));
     }
 
-    private static ArmorStand spawnTextEntity(Location location, String text, String identifier ) {
+    public static ArmorStand spawnTextEntity(Location location, String text, String identifier ) {
         ArmorStand armorStand = (ArmorStand) location.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
         armorStand.setVisible(false);
         armorStand.setCustomNameVisible(true);

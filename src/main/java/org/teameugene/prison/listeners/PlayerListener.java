@@ -20,6 +20,7 @@ import org.teameugene.prison.Util.PacketReader;
 import org.teameugene.prison.Util.User;
 import org.teameugene.prison.database.Database;
 import org.teameugene.prison.ship.Schematic;
+import org.teameugene.prison.ship.Ship;
 import oshi.jna.platform.mac.SystemB;
 
 import java.util.ArrayList;
@@ -36,7 +37,6 @@ public class PlayerListener implements org.bukkit.event.Listener {
     Plugin plugin;
     ArrayList<Schematic> schematicArrayList;
     ArrayList<User> connectedPlayers;
-    String starterShipSchematicName = "spaceship-1";
     String shipWorldName;
 
     public PlayerListener(Plugin plugin, Database database, ArrayList<Schematic> schematicArrayList, String shipWorldName, ArrayList<User> players) {
@@ -61,7 +61,7 @@ public class PlayerListener implements org.bukkit.event.Listener {
             // If not, create an entry for them
             database.createPlayerEntry(sPlayerUniqueId);
             //player is a new player so set them up
-            newPlayer(player, schematicArrayList, starterShipSchematicName, shipWorldName, connectedPlayers, database);
+            newPlayer(player, schematicArrayList, Ship.starterShipSchematicName, shipWorldName, connectedPlayers, database);
         }
          /*
                         END NEW PLAYER LOGIC
