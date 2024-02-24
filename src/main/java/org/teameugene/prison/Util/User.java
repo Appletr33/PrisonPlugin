@@ -1,8 +1,6 @@
 package org.teameugene.prison.Util;
 
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.teameugene.prison.ship.Radar;
 
 import java.util.UUID;
 

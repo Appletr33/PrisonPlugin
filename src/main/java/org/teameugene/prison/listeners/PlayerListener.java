@@ -21,7 +21,6 @@ import org.teameugene.prison.Util.User;
 import org.teameugene.prison.database.Database;
 import org.teameugene.prison.ship.Schematic;
 import org.teameugene.prison.ship.Ship;
-import oshi.jna.platform.mac.SystemB;
 
 import java.util.ArrayList;
 import java.util.UUID;

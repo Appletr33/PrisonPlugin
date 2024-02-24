@@ -7,6 +7,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitTask;
 import org.teameugene.prison.Prison;
 import org.teameugene.prison.Util.*;
+import org.teameugene.prison.mine.Asteroid;
 
 import java.util.*;
 
@@ -20,9 +21,12 @@ public class Radar extends Serialize {
     private Location location;
     @Serializable
     private String ownerUUID;
+    @Serializable
+    private double timeSpentScanning = 0;
 
     Map<String, BukkitTask> subscribedPlayers = new HashMap<>();
     Sound radarSearchingSound = Sound.AMBIENT_UNDERWATER_LOOP;
+
 
     public Radar() {
         super();
@@ -48,6 +52,13 @@ public class Radar extends Serialize {
     public void tick() {
         playingSound = active;
         playSound();
+
+        timeSpentScanning += GameObjectManager.tickSpeed;
+        if (timeSpentScanning > 60) {
+            // 3 seconds
+            timeSpentScanning = 0;
+            Asteroid.generate(Bukkit.getPlayer(ownerUUID));
+        }
     }
 
     private void playSound() {

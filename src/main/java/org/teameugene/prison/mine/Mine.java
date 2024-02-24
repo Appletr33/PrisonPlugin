@@ -16,9 +16,9 @@ import static org.teameugene.prison.Util.Utils.*;
 
 public class Mine {
 
-    private long regenationTime = 1;
+    private long regenerationTime = 1;
     private int warnCount = 0;
-    private final int maxWarnCount = 2;
+    private final int maxWarnCount = 3;
     Plugin plugin;
     World world;
 
@@ -41,7 +41,7 @@ public class Mine {
             @Override
             public void run() {
                 //1 min warning
-                broadcastMessageInWorld(getWorldByName(Prison.moonWorldName), "§6New ore will rise from the mine in 60 seconds!");
+                broadcastMessageInWorld(getWorldByName(Prison.moonWorldName), "§6New ore will rise from the mine in " + regenerationTime + "minute(s)!");
 
                 //Warning Task
                 new BukkitRunnable() {
@@ -59,7 +59,7 @@ public class Mine {
                             cancel();
                         }
                     }
-                }.runTaskTimer(plugin, 20 * 50, 20 * 5);
+                }.runTaskTimer(plugin, (20 * 60 * regenerationTime) - (maxWarnCount * 20), 20);
 
                 //Regen Task
                 new BukkitRunnable() {
@@ -67,9 +67,9 @@ public class Mine {
                     public void run() {
                         regenerateMine();
                     }
-                }.runTaskLater(plugin, 20L * 60 * 1); //1 min delay
+                }.runTaskLater(plugin, 20L * 60 * regenerationTime);
             }
-        }.runTaskTimer(plugin, 0, 20 * 60 * regenationTime); // 20 minutes in ticks
+        }.runTaskTimer(plugin, 0, 20L * 60 * regenerationTime);
     }
 
     private void broadcastWarning() {

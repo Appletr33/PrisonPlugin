@@ -11,7 +11,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.teameugene.prison.Util.CustomMaps;
 import org.teameugene.prison.Util.GameObjectManager;
-import org.teameugene.prison.ship.Radar;
 
 public class ItemFrameListener implements Listener {
 

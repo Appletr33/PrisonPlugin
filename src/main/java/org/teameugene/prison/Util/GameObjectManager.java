@@ -1,6 +1,5 @@
 package org.teameugene.prison.Util;
 
-import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.teameugene.prison.Prison;
 import org.teameugene.prison.ship.Radar;
@@ -13,6 +12,7 @@ public class GameObjectManager {
     public static ArrayList<GameObject> gameObjects = new ArrayList<>();
     public static Map<String, Radar> radars = new HashMap<>();
     private static GameObjectManager instance;
+    public static final int tickSpeed = 10;
 
     public GameObjectManager() {
         instance = this;
@@ -28,7 +28,7 @@ public class GameObjectManager {
             public void run() {
                 tick();
             }
-        }.runTaskTimer(Prison.getInstance(), 0, 10);
+        }.runTaskTimer(Prison.getInstance(), 0, tickSpeed);
     }
 
     private void tick() {
