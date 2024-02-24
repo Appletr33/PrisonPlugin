@@ -80,6 +80,10 @@ public final class Prison extends JavaPlugin implements Listener {
         NPC.setupNPCS();
         //Load tasks which depend on database connection being established
         new Tasks(this, database, connectedPlayers);
+        //Load Objects
+        Serialize.onLoad();
+        //Initialize Game Objects post serialization
+        new GameObjectManager();
 
         //Register Listeners
         getServer().getPluginManager().registerEvents(new PlayerListener(this, database, schematics, shipWorldName, connectedPlayers), this);
@@ -118,8 +122,12 @@ public final class Prison extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        Bukkit.getScheduler().cancelTasks(this);
+        // Close connection with database
         updateDatabase(database, connectedPlayers);
         database.closeConnection();
+        //Save Objects
+        Serialize.onSave();
     }
 
     private void setupWorlds() {

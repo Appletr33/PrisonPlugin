@@ -13,11 +13,14 @@ import org.bukkit.inventory.ItemStack;
 import org.teameugene.prison.Prison;
 import org.teameugene.prison.database.Database;
 import org.teameugene.prison.enums.CustomItem;
+import org.teameugene.prison.ship.Radar;
 import org.teameugene.prison.ship.Schematic;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
@@ -84,6 +87,10 @@ public class Utils {
                 spawnTextEntity(radarLocation, "§b§nRight Click", "radar");
                 radarLocation.setY(radarLocation.getY() + 0.25);
                 spawnTextEntity(radarLocation, "§4§lRadar", "radar");
+                Radar radar = new Radar();
+                radar.setOwnerUUID(player.getUniqueId().toString());
+                radar.setLocation(radarLocation);
+                radar.Initialize();
             }
         }
     }
@@ -314,4 +321,24 @@ public class Utils {
         return null; // Return null if the value is not found
     }
 
+    public static String getHash(String input) {
+        try {
+            // Get a MessageDigest instance for MD5
+            MessageDigest md = MessageDigest.getInstance("MD5");
+
+            // Compute the hash of the input string
+            byte[] bytes = md.digest(input.getBytes());
+
+            // Convert the byte array to a hexadecimal string
+            StringBuilder sb = new StringBuilder();
+            for (byte b : bytes) {
+                sb.append(String.format("%02x", b));
+            }
+
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

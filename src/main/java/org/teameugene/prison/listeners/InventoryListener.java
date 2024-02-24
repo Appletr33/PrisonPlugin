@@ -7,6 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.plugin.Plugin;
+import org.teameugene.prison.Util.GameObjectManager;
 import org.teameugene.prison.Util.User;
 import org.teameugene.prison.database.Database;
 import org.teameugene.prison.ship.Radar;
@@ -68,7 +69,7 @@ public class InventoryListener implements Listener {
         }
         else if (event.getView().getTitle().equals("Radar")) {
             event.setCancelled(true);
-            Radar.handleGUI(event);
+            GameObjectManager.radars.get(event.getWhoClicked().getUniqueId().toString()).handleGUI(event);
         }
 
         // PREVENT ARMOR FROM BEING REMOVED

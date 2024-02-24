@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.teameugene.prison.Util.CustomMaps;
+import org.teameugene.prison.Util.GameObjectManager;
 import org.teameugene.prison.ship.Radar;
 
 public class ItemFrameListener implements Listener {
@@ -27,7 +28,7 @@ public class ItemFrameListener implements Listener {
                 String mapName = CustomMaps.getMapNameFromId(mapId);
 
                 if (mapName.equals("control_panel")) {
-                    Radar.openGUI(player);
+                    GameObjectManager.radars.get(player.getUniqueId().toString()).openGUI(player);
                 }
             }
         }
