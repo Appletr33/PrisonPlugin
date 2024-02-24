@@ -103,6 +103,10 @@ public class Utils {
     }
 
     public static boolean isInRegion(Location source, Location bound1, Location bound2) {
+
+        if (source.getWorld() != bound1.getWorld() || bound1.getWorld() != bound2.getWorld() || source.getWorld() != bound2.getWorld())
+            return false;
+
         return source.getX() >= Math.min(bound1.getX(), bound2.getX()) &&
                 source.getY() >= Math.min(bound1.getY(), bound2.getY()) &&
                 source.getZ() >= Math.min(bound1.getZ(), bound2.getZ()) &&

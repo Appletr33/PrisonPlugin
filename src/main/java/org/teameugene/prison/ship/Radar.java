@@ -8,14 +8,12 @@ import org.bukkit.scheduler.BukkitTask;
 import org.teameugene.prison.Prison;
 import org.teameugene.prison.Util.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.teameugene.prison.Util.Utils.getUserFromPlayer;
 import static org.teameugene.prison.items.ItemUtils.createItemGUI;
 
-public class Radar extends Serialize implements GameObject {
+public class Radar extends Serialize {
     @Serializable
     public boolean active;
     @Serializable
@@ -48,36 +46,16 @@ public class Radar extends Serialize implements GameObject {
     }
 
     public void tick() {
-        for (Player player : location.getWorld().getPlayers()) { //TODO eventually check if party members are on instead of just player
-            if (player.getUniqueId().toString().equals(ownerUUID)) {
-                playSound();
-            }
-        }
+        playingSound = active;
+        playSound();
     }
 
     private void playSound() {
-        if (active) {
+        if (active) { //TODO: REmove this check later at the cost of performance
             for (Player player : location.getWorld().getPlayers()) {
-                if (Utils.isInRegion(player.getLocation(), location.clone().subtract(10, 10, 10), location.clone().add(10, 10, 10))) {
-                    if (!subscribedPlayers.containsKey(player.getName())) {
-                        subscribedPlayers.put(player.getName(), SoundSystem.playContinuousSound(location, radarSearchingSound, 100f, 1f, player));
-                        Prison.getInstance().getLogger().info("Player sounds!!!");
-                    }
-                } else {
-                    if (subscribedPlayers.containsKey(player.getName())) {
-                        subscribedPlayers.get(player.getName()).cancel();
-                        subscribedPlayers.remove(player.getName());
-                        SoundSystem.stopSound(player, radarSearchingSound);
-                        Prison.getInstance().getLogger().info("Stopping sounds!!!");
-                    }
-                }
+                User usr = Utils.getUserFromPlayer(player, Prison.connectedPlayers);
+                usr.soundSystem.playContinuousSound(location, radarSearchingSound, 100f, 1f, 10, player, this, 10);
             }
-        } else {
-            for (String uuid : subscribedPlayers.keySet()) {
-               Bukkit.getPlayer(uuid).stopSound(radarSearchingSound);
-                subscribedPlayers.get(uuid).cancel();
-            }
-            subscribedPlayers.clear();
         }
     }
 

@@ -9,10 +9,12 @@ import java.util.UUID;
 public class User {
     private long points;
     private Player player;
+    public final SoundSystem soundSystem;
 
     public User(long points, Player player) {
         this.points = points;
         this.player = player;
+        this.soundSystem = new SoundSystem();
     }
 
     public long getPoints() {

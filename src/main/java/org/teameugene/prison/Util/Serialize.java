@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Serialize {
+public abstract class Serialize extends GameObject {
     protected String className;
     protected static ArrayList<org.teameugene.prison.Util.Serialize> instances = new ArrayList<>();
     private static final CustomFile dataFile = new CustomFile("objects.yml");

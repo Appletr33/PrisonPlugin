@@ -1,9 +1,11 @@
 package org.teameugene.prison.Util;
 
-public interface GameObject {
-    public void Initialize();
+public abstract class GameObject {
+    public boolean playingSound = false;
 
-    public void tick();
+    public abstract void Initialize();
+
+    public abstract void tick();
 }
 
 
