@@ -6,3 +6,6 @@ load: STARTUP
 authors: [ Xander, Isaac, Johnathan ]
 commands:
   map:
+depend:
+  - WorldEdit
+  - WorldGuard

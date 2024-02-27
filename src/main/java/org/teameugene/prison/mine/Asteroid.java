@@ -37,7 +37,7 @@ public class Asteroid {
     public static void generate(UUID uuid) {
         //Calculate asteroid data
         float posX = Prison.database.findAsteroidWithLargestPositionX();
-        if (posX == -1 || posX > 0) //TODO remove  > 0 when testing complete
+        if (posX == -1)  // remove  > 0 when testing complete || posX > 0
             return;
         posX += 500;
         int radius = Utils.randomInt(8, 15);

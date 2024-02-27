@@ -1,6 +1,10 @@
 package org.teameugene.prison.ship;
 
+import net.minecraft.network.protocol.game.ClientboundInitializeBorderPacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
+import net.minecraft.world.level.border.WorldBorder;
 import org.bukkit.*;
+import org.bukkit.craftbukkit.v1_20_R2.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -30,8 +34,7 @@ public class Radar extends Serialize {
     @Serializable
     private double timeSpentScanning = 0;
 
-    Map<String, BukkitTask> subscribedPlayers = new HashMap<>();
-    Sound radarSearchingSound = Sound.AMBIENT_UNDERWATER_LOOP;
+    Sound radarSearchingSound = Sound.ENTITY_DOLPHIN_AMBIENT_WATER;
 
     public Radar() {
         super();
@@ -40,6 +43,7 @@ public class Radar extends Serialize {
 
     public void Initialize() {
         GameObjectManager.radars.put(ownerUUID, this);
+        GameObjectManager.gameObjects.add(this);
     }
 
     public void setOwnerUUID(String ownerUUID) {
@@ -60,7 +64,7 @@ public class Radar extends Serialize {
 
         if (active) {
             timeSpentScanning += GameObjectManager.tickSpeed;
-            if (timeSpentScanning > 60) {
+            if (timeSpentScanning > 600 * 2) {
                 // 3 seconds
                 timeSpentScanning = 0;
                 Asteroid.generate(UUID.fromString(ownerUUID));
@@ -72,12 +76,12 @@ public class Radar extends Serialize {
         if (active) { //TODO: REmove this check later at the cost of performance
             for (Player player : location.getWorld().getPlayers()) {
                 User usr = Utils.getUserFromPlayer(player, Prison.connectedPlayers);
-                usr.soundSystem.playContinuousSound(location, radarSearchingSound, 100f, 1f, 10, player, this, 10);
+                usr.soundSystem.playContinuousSound(location, radarSearchingSound, 100f, 1f, 0.1f, player, this, 10);
             }
         }
     }
 
-    public void openGUI(Player player) {
+    public void openGUI(Player player, int page) {
         Inventory upgradeGUI = Bukkit.createInventory(player, 54, "Radar");
         User user = getUserFromPlayer(player, Prison.connectedPlayers);
         assert user != null;
@@ -142,7 +146,7 @@ public class Radar extends Serialize {
                     User user = getUserFromPlayer(player, Prison.connectedPlayers);
                     assert user != null;
                     toggleActive();
-                    openGUI(player);
+                    openGUI(player, 1);
            }
            else if (event.getCurrentItem().getType().equals(Material.FIRE_CHARGE)) {
                ItemMeta meta = event.getCurrentItem().getItemMeta();
@@ -150,8 +154,19 @@ public class Radar extends Serialize {
                    if (meta.getPersistentDataContainer().has(Keys.positionKey, PersistentDataType.FLOAT)) {
                        float asteroidCenterX = meta.getPersistentDataContainer().get(Keys.positionKey, PersistentDataType.FLOAT);
                        int asteroidRadius = meta.getPersistentDataContainer().get(Keys.radiusKey, PersistentDataType.INTEGER);
+                       //Teleport player to asteroid and setup bounds restrictions
                        player.teleport(new Location(getWorldByName(Prison.asteroidWorldName), asteroidCenterX + asteroidRadius + 10, 70 + asteroidRadius + 1, 4));
+                       WorldBorder br = new net.minecraft.world.level.border.WorldBorder();
+                       br.world = ((CraftWorld) player.getWorld()).getHandle();
+                       br.setCenter(asteroidCenterX, 0);
+                       br.setSize(200);
+                       Utils.sendPacket(new ClientboundInitializeBorderPacket(br), player);
+                       Utils.getUserFromPlayer(player, Prison.connectedPlayers).restrict(new Location(player.getWorld(), asteroidCenterX, 70, 0), 200);
                    }
+               }
+               else if (event.getCurrentItem().getType().equals(Material.ARROW)) {
+                   openGUI(player, 1);
+                   //TODO FINISH IMPLEMEnTING MULTIPLE PAGES
                }
            }
         }

@@ -16,7 +16,7 @@ public class SoundSystem {
 
     private Map<Sound, BukkitTask> continuouslyPlayingSounds = new HashMap<>();
 
-    public void playContinuousSound(final Location location, final Sound sound, final float volume, final float pitch, long lengthInSeconds, final Player player, GameObject gameObject, int radiusToPlayTo) {
+    public void playContinuousSound(final Location location, final Sound sound, final float volume, final float pitch, float lengthInSeconds, final Player player, GameObject gameObject, int radiusToPlayTo) {
         // Create and return the BukkitTask representing the scheduled task
 
         boolean inRegion =  Utils.isInRegion(player.getLocation(), location.clone().subtract(radiusToPlayTo, radiusToPlayTo, radiusToPlayTo), location.clone().add(radiusToPlayTo, radiusToPlayTo, radiusToPlayTo));
@@ -44,7 +44,7 @@ public class SoundSystem {
                 }
                 player.playSound(location, sound, volume, pitch);
             }
-        }.runTaskTimerAsynchronously(Prison.getInstance(), 0L, 20 * lengthInSeconds); // Delay 0 ticks, period 20 ticks (1 second)
+        }.runTaskTimerAsynchronously(Prison.getInstance(), 0L, (long)(20 * lengthInSeconds)); // Delay 0 ticks, period 20 ticks (1 second)
 
         continuouslyPlayingSounds.put(sound, bt);
     }

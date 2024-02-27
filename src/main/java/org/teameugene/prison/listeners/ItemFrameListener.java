@@ -27,7 +27,7 @@ public class ItemFrameListener implements Listener {
                 String mapName = CustomMaps.getMapNameFromId(mapId);
 
                 if (mapName.equals("control_panel")) {
-                    GameObjectManager.radars.get(player.getUniqueId().toString()).openGUI(player);
+                    GameObjectManager.radars.get(player.getUniqueId().toString()).openGUI(player, 1);
                 }
             }
         }

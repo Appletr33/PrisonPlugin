@@ -19,7 +19,6 @@ public class GameObjectManager {
         for (Object obj : Serialize.instances) {
             if (obj instanceof GameObject object) {
                 object.Initialize();
-                gameObjects.add(object);
             }
         }
 
