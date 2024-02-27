@@ -19,12 +19,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class Schematic {
 
     private final Clipboard clipboard;
     private String schematicName;
+
+    public static Map<String, Schematic> schematics = new HashMap<>();
 
     public Schematic(Clipboard clipboard) {
         this.clipboard = clipboard;
@@ -42,9 +46,8 @@ public class Schematic {
         return this.schematicName;
     }
 
-    public static ArrayList<Schematic> loadSchematics(Plugin plugin) {
+    public static void loadSchematics(Plugin plugin) {
         File schematicFolder = new File(plugin.getDataFolder() + "/../WorldEdit/schematics/");
-        ArrayList<Schematic> schematics = new ArrayList<>();
 
         // Check if the directory exists
         if (schematicFolder.exists() && schematicFolder.isDirectory()) {
@@ -59,8 +62,9 @@ public class Schematic {
                         plugin.getLogger().info("Found schematic file: " + schematicName);
                         Optional<Schematic> schematic = load(file);
                         if (schematic.isPresent()) {
+                            schematicName = schematicName.replace(".schem", "");
                             schematic.get().setName(schematicName);
-                            schematics.add(schematic.get());
+                            schematics.put(schematicName, schematic.get());
                         }
                     }
                 }
@@ -72,8 +76,6 @@ public class Schematic {
             // Handle the case where the schematic folder does not exist
             plugin.getLogger().warning("Schematic folder does not exist: " + schematicFolder.getAbsolutePath());
         }
-
-        return schematics;
     }
 
     public void paste(org.bukkit.Location target) {

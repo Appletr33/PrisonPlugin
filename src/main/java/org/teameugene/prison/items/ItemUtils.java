@@ -19,10 +19,7 @@ import org.teameugene.prison.npcs.NPC;
 import org.teameugene.prison.npcs.WeaponForger;
 import oshi.jna.platform.mac.SystemB;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static org.teameugene.prison.Util.RomanParser.intToRoman;
 import static org.teameugene.prison.Util.RomanParser.romanToInt;
@@ -175,6 +172,15 @@ public class ItemUtils {
         ItemMeta itemMeta = item.getItemMeta();
         itemMeta.setDisplayName(upgradeName);
         itemMeta.setLore(Collections.singletonList(lore));
+        item.setItemMeta(itemMeta);
+        return item;
+    }
+
+    public static ItemStack createItemGUI(String upgradeName, ArrayList<String> lore, Material material) {
+        ItemStack item = new ItemStack(material);
+        ItemMeta itemMeta = item.getItemMeta();
+        itemMeta.setDisplayName(upgradeName);
+        itemMeta.setLore(lore);
         item.setItemMeta(itemMeta);
         return item;
     }

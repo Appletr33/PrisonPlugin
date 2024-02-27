@@ -41,7 +41,7 @@ public class Mine {
             @Override
             public void run() {
                 //1 min warning
-                broadcastMessageInWorld(getWorldByName(Prison.moonWorldName), "§6New ore will rise from the mine in " + regenerationTime + "minute(s)!");
+                broadcastMessageInWorld(getWorldByName(Prison.moonWorldName), "§6New ore will rise from the mine in " + regenerationTime + " minute(s)!");
 
                 //Warning Task
                 new BukkitRunnable() {

@@ -34,9 +34,6 @@ public class SoundSystem {
         BukkitTask bt = new BukkitRunnable() {
             @Override
             public void run() {
-
-                Prison.getInstance().getLogger().info("PLAYING = " + gameObject.playingSound);
-
                 if (!gameObject.playingSound || !Utils.isInRegion(player.getLocation(), location.clone().subtract(radiusToPlayTo, radiusToPlayTo, radiusToPlayTo), location.clone().add(radiusToPlayTo, radiusToPlayTo, radiusToPlayTo))) {
                     if (continuouslyPlayingSounds.containsKey(sound)) {
                         continuouslyPlayingSounds.remove(sound);

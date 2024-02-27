@@ -34,14 +34,12 @@ public class PlayerListener implements org.bukkit.event.Listener {
 
     Database database;
     Plugin plugin;
-    ArrayList<Schematic> schematicArrayList;
     ArrayList<User> connectedPlayers;
     String shipWorldName;
 
-    public PlayerListener(Plugin plugin, Database database, ArrayList<Schematic> schematicArrayList, String shipWorldName, ArrayList<User> players) {
+    public PlayerListener(Plugin plugin, Database database, String shipWorldName, ArrayList<User> players) {
         this.database = database;
         this.plugin = plugin;
-        this.schematicArrayList = schematicArrayList;
         this.shipWorldName = shipWorldName;
         this.connectedPlayers = players;
     }
@@ -60,7 +58,7 @@ public class PlayerListener implements org.bukkit.event.Listener {
             // If not, create an entry for them
             database.createPlayerEntry(sPlayerUniqueId);
             //player is a new player so set them up
-            newPlayer(player, schematicArrayList, Ship.starterShipSchematicName, shipWorldName, connectedPlayers, database);
+            newPlayer(player, Ship.starterShipSchematicName, shipWorldName, connectedPlayers, database);
         }
          /*
                         END NEW PLAYER LOGIC

@@ -4,13 +4,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
+import org.teameugene.prison.Util.BytePacking;
+import org.teameugene.prison.enums.Difficulty;
+import org.teameugene.prison.enums.Ore;
+import org.teameugene.prison.mine.Asteroid;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -260,4 +260,106 @@ public class Database {
 
         return leaderboard;
     }
+
+    public float findAsteroidWithLargestPositionX() {
+        try {
+            // Create a statement
+            Statement stmt = connection.createStatement();
+
+            // SQL query to retrieve the asteroid with the largest position_x
+            String sql = "SELECT * FROM asteroids ORDER BY position_x DESC LIMIT 1";
+
+            // Execute the query
+            ResultSet rs = stmt.executeQuery(sql);
+
+            // Check if any rows were returned
+            if (rs.next()) {
+                return rs.getFloat("position_x");
+            } else {
+                return 0f;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    public void addAsteroid(float positionX, int difficulty, int radius, long oreTypes, UUID playerUUID) {
+        try {
+            // Get the player_id based on the UUID
+            int playerId = getPlayerIdByUUID(connection, playerUUID);
+
+            // Create a prepared statement to insert the asteroid
+            String sql = "INSERT INTO asteroids (position_x, difficulty, radius, oretypes, player_id) VALUES (?, ?, ?, ?, ?)";
+            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+                pstmt.setFloat(1, positionX);
+                pstmt.setInt(2, difficulty);
+                pstmt.setInt(3, radius);
+                pstmt.setLong(4, oreTypes);
+                pstmt.setInt(5, playerId);
+
+                // Execute the insert statement
+                pstmt.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private int getPlayerIdByUUID(Connection conn, UUID playerUUID) throws SQLException {
+        int playerId = -1;
+        String sql = "SELECT id FROM players WHERE player_uuid = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, playerUUID.toString());
+            // Execute the query
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    playerId = rs.getInt("id");
+                }
+            }
+        }
+        return playerId;
+    }
+
+    public ArrayList<Asteroid> getAsteroidsByPlayerUUID(UUID playerUUID) {
+        ArrayList<Asteroid> asteroids = new ArrayList<>();
+        try {
+            int playerId = getPlayerIdByUUID(connection, playerUUID);
+            String sql = "SELECT id, position_x, difficulty, radius, oretypes FROM asteroids WHERE player_id = ? ORDER BY id";
+
+            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+                pstmt.setInt(1, playerId);
+
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    while (rs.next()) {
+                        int id = rs.getInt("id");
+                        float positionX = rs.getFloat("position_x");
+                        int difficulty = rs.getInt("difficulty");
+                        int radius = rs.getInt("radius");
+                        long oreTypes = rs.getLong("oretypes");
+
+                        //Unpack the data
+                        Difficulty difficulty1 = Difficulty.values()[difficulty];
+                        byte[] oreBytes = BytePacking.unpackBytes(oreTypes);
+                        ArrayList<Ore> oreTypes1 = new ArrayList<>();
+                        for (int i = 0; i < oreBytes.length; i++) {
+                            int ordinal = ((int) oreBytes[i]) - 1;
+                            if (ordinal < 0)
+                                continue;
+                            oreTypes1.add(Ore.values()[ordinal]);
+                        }
+
+                        // Create an Asteroid object and add it to the list
+                        Asteroid asteroid = new Asteroid(id, positionX, difficulty1, radius, oreTypes1);
+                        asteroids.add(asteroid);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return asteroids;
+    }
+
 }

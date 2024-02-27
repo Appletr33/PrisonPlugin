@@ -59,4 +59,13 @@ public enum Ore {
         }
         return itemStack;
     }
+
+    public static byte[] convertOresToBytes(Ore[] ores) {
+        byte[] bytes = new byte[ores.length];
+        for (int i = 0; i < ores.length; i++) {
+            bytes[i] = (byte) (ores[i].ordinal() + 1);
+        }
+        return bytes;
+    }
+
 }

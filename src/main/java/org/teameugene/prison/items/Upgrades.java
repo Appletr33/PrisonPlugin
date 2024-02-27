@@ -73,7 +73,7 @@ public class Upgrades {
             int level = entry.getValue();
 
             if (upgrade.equals(Upgrade.GODLY_OVERLOAD)) {
-                double maxHealth = 20 + (5 * 0.1 * level);
+                double maxHealth = 20 + 20 * (5 * 0.1 * level);
                 setPlayerMaxHealth(player, maxHealth);
             }
         }

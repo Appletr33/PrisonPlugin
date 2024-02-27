@@ -15,6 +15,7 @@ import org.teameugene.prison.database.Database;
 import org.teameugene.prison.enums.CustomItem;
 import org.teameugene.prison.ship.Radar;
 import org.teameugene.prison.ship.Schematic;
+import org.teameugene.prison.ship.Ship;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -70,29 +71,26 @@ public class Utils {
             }
     }
 
-    public static void newPlayer(Player player, ArrayList<Schematic> schematicArrayList, String starterShipSchematicName, String shipWorldName, ArrayList<User> connectedPlayers, Database database) {
+    public static void newPlayer(Player player, String starterShipSchematicName, String shipWorldName, ArrayList<User> connectedPlayers, Database database) {
         player.sendMessage("Welcome to the moon trooper, " + player.getName() + "!");
         Utils.giveItemsToPlayer(player);
 
         //Create the startership
         double[] pos = database.getPlayerShipCoordinates(player.getUniqueId());
-        for (Schematic schematic : schematicArrayList) {
-            if (schematic.getName().equals(starterShipSchematicName + ".schem")) {
-                schematic.paste(new Location(getWorldByName(shipWorldName), pos[0] - 14 + 27, pos[1] - 5 +6, pos[2] + 9)); //offset values for the schematic so the player spawns on the ship
-                Location radarLocation = new Location(getWorldByName(shipWorldName), pos[0], pos[1] + 1, pos[2] -5);
-                setItemFrameImage(radarLocation, "control_panel");
-                radarLocation.setY(radarLocation.getY() + 0.5);
-                radarLocation.setX(radarLocation.getX() + 0.5);
-                radarLocation.setZ(radarLocation.getZ() + 0.5);
-                spawnTextEntity(radarLocation, "§b§nRight Click", "radar");
-                radarLocation.setY(radarLocation.getY() + 0.25);
-                spawnTextEntity(radarLocation, "§4§lRadar", "radar");
-                Radar radar = new Radar();
-                radar.setOwnerUUID(player.getUniqueId().toString());
-                radar.setLocation(radarLocation);
-                radar.Initialize();
-            }
-        }
+        Schematic schematic = Schematic.schematics.get(Ship.starterShipSchematicName);
+        schematic.paste(new Location(getWorldByName(shipWorldName), pos[0] - 14 + 27, pos[1] - 5 +6, pos[2] + 9)); //offset values for the schematic so the player spawns on the ship
+        Location radarLocation = new Location(getWorldByName(shipWorldName), pos[0], pos[1] + 1, pos[2] -5);
+        setItemFrameImage(radarLocation, "control_panel");
+        radarLocation.setY(radarLocation.getY() + 0.5);
+        radarLocation.setX(radarLocation.getX() + 0.5);
+        radarLocation.setZ(radarLocation.getZ() + 0.5);
+        spawnTextEntity(radarLocation, "§b§nRight Click", "radar");
+        radarLocation.setY(radarLocation.getY() + 0.25);
+        spawnTextEntity(radarLocation, "§4§lRadar", "radar");
+        Radar radar = new Radar();
+        radar.setOwnerUUID(player.getUniqueId().toString());
+        radar.setLocation(radarLocation);
+        radar.Initialize();
     }
 
     private static void setItemFrameImage(Location location, String mapName) {

@@ -30,10 +30,10 @@ public final class Prison extends JavaPlugin implements Listener {
     private static Prison instance;
     public static Mine mine;
     public static Database database;
-    ArrayList<Schematic> schematics;
     public static final String shipWorldName = "shipworld";
     public static final String marsWorldName = "mars";
     public static final String moonWorldName = "moon";
+    public static final String asteroidWorldName = "asteroid-world";
     public static boolean worldInitialization = false;
     public boolean reloaded = false;
     public static final ArrayList<User> connectedPlayers = new ArrayList<>();
@@ -53,7 +53,9 @@ public final class Prison extends JavaPlugin implements Listener {
         //Set random seed for random actions
         random.setSeed(System.currentTimeMillis() + 1349832);
         //Load Schematics
-        schematics = Schematic.loadSchematics(this);
+        Schematic.loadSchematics(this);
+        //Init Namespaced Keys
+        new Keys();
         try {
             CustomMaps.Initialize();
         } catch (FileNotFoundException | Execeptions.DirectoryNotFoundException e) {
@@ -86,7 +88,7 @@ public final class Prison extends JavaPlugin implements Listener {
         new GameObjectManager();
 
         //Register Listeners
-        getServer().getPluginManager().registerEvents(new PlayerListener(this, database, schematics, shipWorldName, connectedPlayers), this);
+        getServer().getPluginManager().registerEvents(new PlayerListener(this, database, shipWorldName, connectedPlayers), this);
         getServer().getPluginManager().registerEvents(new ItemListener(this, database, shipWorldName, connectedPlayers), this);
         getServer().getPluginManager().registerEvents(new InventoryListener(this, database, connectedPlayers), this);
         getServer().getPluginManager().registerEvents(new NPCInteractListener(), this);
@@ -135,6 +137,7 @@ public final class Prison extends JavaPlugin implements Listener {
         worldNames.add(marsWorldName);
         worldNames.add(moonWorldName);
         worldNames.add(shipWorldName);
+        worldNames.add(asteroidWorldName);
 
         for (String worldName : worldNames) {
             WorldCreator worldCreator = new WorldCreator(worldName);
@@ -160,7 +163,11 @@ public final class Prison extends JavaPlugin implements Listener {
         getWorldByName(shipWorldName).setTime(18000); // 12am
 
         getWorldByName(marsWorldName).setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
-        getWorldByName(marsWorldName).setTime(9000); // 12am
+        getWorldByName(marsWorldName).setTime(9000); // 12pm
+
+        getWorldByName(asteroidWorldName).setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+        getWorldByName(asteroidWorldName).setTime(18000); //12am
+
     }
 
     @Override
